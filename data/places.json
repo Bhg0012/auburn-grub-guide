@@ -5,7 +5,7 @@
       "name": "Flying Biscuit Café",
       "category": "Breakfast",
       "price": "$$",
-      "rating": 8.2,
+      "rating": 8.0,
       "comments": [
         "Unique breakfast options you don't always see.",
         "They serve breakfast until 2pm, which is good. Most other places stop serving by then."
@@ -39,7 +39,7 @@
       "name": "Sushi Kingdom",
       "category": "Sushi",
       "price": "$$",
-      "rating": 8.6,
+      "rating": 8.4,
       "verdict": "Must-go",
       "comments": [
         "All you can eat sushi, and it's fresh.",
@@ -396,6 +396,148 @@
         "images/places/einstein-bros/4.jpg"
       ],
       "photoCredit": "Einstein Bros. Bagels and The Auburn Plainsman"
+    },
+    {
+      "id": "tekila",
+      "name": "Tekila",
+      "category": "Mexican",
+      "price": "$$",
+      "rating": 7.5,
+      "comments": [
+        "Cool drinks.",
+        "A little pricier.",
+        "Good food and decent service.",
+        "Great location downtown."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Downtown",
+        "Margaritas",
+        "Bar"
+      ],
+      "added": "2026-10-23T21:48:00",
+      "blurb": "Locally owned Mexican bar and grill on W Magnolia, a couple of blocks from Toomer's Corner. Known for its colorful margaritas, plus street tacos, birria tacos, fajitas and seafood plates like arroz con mariscos.",
+      "address": "234 W Magnolia Ave, Suite C, Auburn, AL 36832",
+      "area": "Downtown",
+      "lat": 32.6067636,
+      "lng": -85.4844029,
+      "phone": "(334) 209-1523",
+      "website": "https://www.tekilaauburn.com",
+      "hours": "Mon-Fri 11am-8:45pm, Sat 11am-9:45pm",
+      "photos": [
+        "images/places/tekila/1.jpg",
+        "images/places/tekila/2.jpg",
+        "images/places/tekila/3.jpg",
+        "images/places/tekila/4.jpg",
+        "images/places/tekila/5.jpg"
+      ],
+      "photoCredit": "Tekila"
+    },
+    {
+      "id": "agave-loco",
+      "name": "Agave Loco",
+      "category": "Mexican",
+      "price": "$$",
+      "rating": 7.9,
+      "comments": [
+        "Smaller place, usually pretty busy.",
+        "Great food at normal prices.",
+        "Cool vibe and aesthetic.",
+        "Not as great for larger parties."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Opelika Rd",
+        "Margaritas",
+        "Weekly specials"
+      ],
+      "added": "2026-10-23T21:49:00",
+      "blurb": "Colorful Mexican grill on Opelika Road across from Country's Barbecue, known for big margaritas, sizzling fajitas, burritos and combo plates. There's a sister location in Opelika.",
+      "address": "1032 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.6186991,
+      "lng": -85.4596037,
+      "phone": "(334) 826-0150",
+      "website": "http://agavelocoauburn.com",
+      "hours": "Mon-Thu 11am-9:30pm, Fri-Sat 11am-10pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/agave-loco/1.jpg",
+        "images/places/agave-loco/2.jpg",
+        "images/places/agave-loco/3.jpg",
+        "images/places/agave-loco/4.jpg",
+        "images/places/agave-loco/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "acapulcos",
+      "name": "Acapulco's Mexican Grill",
+      "category": "Mexican",
+      "price": "$$",
+      "rating": 8.1,
+      "comments": [
+        "Can get really busy.",
+        "Great food, a little pricier.",
+        "Good alcoholic drinks.",
+        "Lots of choices.",
+        "Good for accommodating large groups.",
+        "A few times the waiter has taken a long time to get us our checks."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Big groups",
+        "Full bar",
+        "South College"
+      ],
+      "added": "2026-10-23T21:50:00",
+      "blurb": "Busy sit-down Mexican spot on South College with a big menu of fajitas, molcajetes, enchiladas, burritos and street tacos, plus a full bar.",
+      "address": "1409 S College St, Auburn, AL 36832",
+      "area": "South College",
+      "lat": 32.580376,
+      "lng": -85.4949338,
+      "phone": "(334) 501-9197",
+      "hours": "Sun-Thu 11am-10pm, Fri-Sat 11am-11pm",
+      "photos": [
+        "images/places/acapulcos/1.jpg",
+        "images/places/acapulcos/2.jpg",
+        "images/places/acapulcos/3.jpg",
+        "images/places/acapulcos/4.jpg",
+        "images/places/acapulcos/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "el-dorado",
+      "name": "El Dorado",
+      "category": "Mexican",
+      "price": "$$",
+      "rating": 7.5,
+      "comments": [
+        "Normal Mexican food, nothing too special.",
+        "Decent service.",
+        "Normal prices."
+      ],
+      "mustTry": [],
+      "tags": [
+        "South College",
+        "Plainsman's Choice winner"
+      ],
+      "added": "2026-10-23T21:51:00",
+      "blurb": "Longtime Mexican restaurant in a stone building just off South College, and a repeat winner of The Plainsman's Choice for best Mexican food, including 2018 and 2022.",
+      "address": "1658 S College St, Auburn, AL 36832",
+      "area": "South College",
+      "lat": 32.5746606,
+      "lng": -85.4995682,
+      "phone": "(334) 887-8836",
+      "hours": "Mon-Thu 11am-10pm, Fri-Sat 11am-11pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/el-dorado/1.jpg",
+        "images/places/el-dorado/2.jpg",
+        "images/places/el-dorado/3.jpg",
+        "images/places/el-dorado/4.jpg",
+        "images/places/el-dorado/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers and The Auburn Plainsman"
     }
   ]
 }

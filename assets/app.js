@@ -552,7 +552,7 @@
     const gl = window.maplibregl;
     const pts = state.places.filter(hasCoords);
     if (!gl || !mapState.map || !pts.length) return;
-    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 90, right: 90 }, maxZoom: 15 };
+    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 110, right: 110 }, maxZoom: 15 };
     if (pts.length === 1) { mapState.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: opts.duration }); return; }
     const b = new gl.LngLatBounds();
     pts.forEach((p) => b.extend([p.lng, p.lat]));

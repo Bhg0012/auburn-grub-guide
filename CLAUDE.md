@@ -23,7 +23,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
    `curl -sS -A "AuburnGrubGuide/1.0" "https://nominatim.openstreetmap.org/search?q=<name or address>&format=json&limit=3"`
    If it isn't in OSM, try the address alone, or pull lat/lng from a listing page (MapQuest pages embed them).
 3. **Details.** Hours, phone, website from the restaurant's own site first; MapQuest/Yelp listings as backup. Leave a field out rather than guess (e.g. conflicting phone numbers -> omit `phone`).
-4. **Photos (3-5).** Prefer the restaurant's own site (food shots), then Yelp photos (MapQuest place pages list Yelp photo IDs; full size is `https://s3-media0.fl.yelpcdn.com/bphoto/<id>/o.jpg`). Download into the scratchpad, look at a contact sheet, drop anything that isn't clearly this restaurant (listing pages mix in neighbors), then:
+4. **Photos (3-5).** Prefer the restaurant's own site (food shots), then Yelp photos (MapQuest place pages list Yelp photo IDs; full size is `https://s3-media0.fl.yelpcdn.com/bphoto/<id>/o.jpg`). Every MapQuest page also embeds the same 8 unrelated "nearby" Yelp photo IDs (8iyvGl..., MQNk_..., TmjSdtR2c..., aaefftRd5..., ds4sQg4..., eOT9kGSs..., rwH8C5..., tVJkm83a...); skip those. Find MapQuest pages with `curl https://html.duckduckgo.com/html/?q=mapquest+<name>+auburn+al`. Download into the scratchpad, look at a contact sheet, drop anything that isn't clearly this restaurant (listing pages mix in neighbors), then:
    `python3 scripts/process_photo.py <id> best.jpg second.jpg ...`
    Put the most appetizing, landscape-friendly shot first: it's the card cover (cropped to 16:10).
 5. **Write the entry** in `data/places.json` (append to `places`):
