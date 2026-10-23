@@ -1,0 +1,64 @@
+{
+  "places": [
+    {
+      "id": "flying-biscuit",
+      "name": "Flying Biscuit Café",
+      "category": "Breakfast",
+      "price": "$$",
+      "rating": 4.1,
+      "comments": [
+        "Unique breakfast options you don't always see.",
+        "They serve breakfast until 2pm, which is good. Most other places stop serving by then."
+      ],
+      "mustTry": [],
+      "tags": ["Breakfast til 2", "Brunch", "Patio"],
+      "added": "2026-10-23T20:30:00",
+      "blurb": "Southern breakfast and brunch café that started in Atlanta, known for fluffy biscuits with cranberry apple butter, moon dusted potatoes, chicken and waffles, and shrimp and grits. The Tiger Town location opened in December 2022 with a dining room and a patio.",
+      "address": "2524 Enterprise Dr, Opelika, AL 36801",
+      "area": "Tiger Town",
+      "lat": 32.6196092,
+      "lng": -85.410778,
+      "phone": "(334) 752-7060",
+      "website": "https://flyingbiscuit.com/locations-2/auburn-tiger-town",
+      "hours": "Mon-Fri 7am-2pm, Sat-Sun 7am-3pm",
+      "photos": [
+        "images/places/flying-biscuit/1.jpg",
+        "images/places/flying-biscuit/2.jpg",
+        "images/places/flying-biscuit/3.jpg",
+        "images/places/flying-biscuit/4.jpg",
+        "images/places/flying-biscuit/5.jpg"
+      ],
+      "photoCredit": "Flying Biscuit Café"
+    },
+    {
+      "id": "sushi-kingdom",
+      "name": "Sushi Kingdom",
+      "category": "Sushi",
+      "price": "$$",
+      "rating": 4.3,
+      "comments": [
+        "All you can eat sushi, and it's fresh.",
+        "Cool roll options, plus a buffet bar for appetizers.",
+        "A robot brings you your sushi when it's done!",
+        "Really cool Japanese designs and decorations.",
+        "Our waiter was super nice."
+      ],
+      "mustTry": [],
+      "tags": ["All You Can Eat", "Robot servers", "Hibachi"],
+      "added": "2026-10-23T20:45:00",
+      "blurb": "All-you-can-eat sushi and hibachi spot on Pepperell Parkway that opened in summer 2026. Rolls, nigiri and sashimi are made to order and delivered to your table by robot, with a hot bar for appetizers. AYCE tiers are Silver $23.99 (no cold bar), Gold $31.99 (no crab legs) and Diamond $38.99 (full menu) per person.",
+      "address": "2820 Pepperell Pkwy, Opelika, AL 36801",
+      "area": "Opelika",
+      "lat": 32.63629,
+      "lng": -85.4186,
+      "hours": "Mon-Thu 11am-9pm, Fri-Sun 11am-10pm",
+      "photos": [
+        "images/places/sushi-kingdom/1.jpg",
+        "images/places/sushi-kingdom/2.jpg",
+        "images/places/sushi-kingdom/3.jpg",
+        "images/places/sushi-kingdom/4.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    }
+  ]
+}

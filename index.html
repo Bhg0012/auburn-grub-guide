@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Auburn Grub Guide</title>
+  <meta name="description" content="Every local spot we've tried in Auburn, rated and remembered.">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Grub Guide">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta property="og:title" content="Auburn Grub Guide">
+  <meta property="og:description" content="Every local spot we've tried in Auburn, rated and remembered.">
+  <meta property="og:image" content="assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Guide -->
+    <section class="screen is-active" id="screen-guide" data-tab="guide" aria-label="Guide">
+      <header class="nav">
+        <div class="nav-title">Auburn Grub Guide</div>
+        <div class="nav-actions">
+          <button class="glass-btn" id="btnPick" aria-label="Pick a spot for us"><svg class="ic" data-icon="dice"></svg></button>
+          <button class="glass-btn" id="btnAdd" aria-label="How to add a spot"><svg class="ic" data-icon="plus"></svg></button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="large-title">
+          <p class="eyebrow" id="guideEyebrow">Auburn, Alabama</p>
+          <h1>Auburn Grub Guide</h1>
+        </div>
+        <label class="search">
+          <svg class="ic" data-icon="search"></svg>
+          <input id="search" type="search" placeholder="Search spots, food, notes" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+          <button class="search-clear" id="searchClear" type="button" aria-label="Clear search"><svg class="ic" data-icon="xfill"></svg></button>
+        </label>
+        <div id="hero"></div>
+        <div class="section-head" id="listHead">
+          <h2 id="listTitle">All Spots</h2>
+          <div class="segmented" id="sort" role="tablist" aria-label="Sort">
+            <span class="segmented-thumb"></span>
+            <button role="tab" data-sort="top" aria-selected="true">Top Rated</button>
+            <button role="tab" data-sort="new" aria-selected="false">Newest</button>
+            <button role="tab" data-sort="az" aria-selected="false">A-Z</button>
+          </div>
+        </div>
+        <div class="chips" id="chips" role="toolbar" aria-label="Filter by type"></div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
+
+    <!-- Map -->
+    <section class="screen screen--map" id="screen-map" data-tab="map" aria-label="Map">
+      <div id="map" class="map"></div>
+      <div class="map-top glass">
+        <span class="map-top-title">Map</span>
+        <span class="map-top-count" id="mapCount"></span>
+      </div>
+      <button class="glass-btn map-locate" id="mapFit" aria-label="Show all spots"><svg class="ic" data-icon="scope"></svg></button>
+      <div class="map-preview" id="mapPreview"></div>
+    </section>
+
+    <!-- Stats -->
+    <section class="screen" id="screen-stats" data-tab="stats" aria-label="Stats">
+      <header class="nav">
+        <div class="nav-title">Stats</div>
+      </header>
+      <div class="content">
+        <div class="large-title">
+          <p class="eyebrow">By the numbers</p>
+          <h1>Stats</h1>
+        </div>
+        <div id="stats"></div>
+      </div>
+    </section>
+
+    <nav class="tabbar glass" id="tabbar" aria-label="Tabs">
+      <span class="tabbar-lens"></span>
+      <button data-tab="guide" class="is-active" aria-label="Guide"><svg class="ic" data-icon="fork"></svg><span>Guide</span></button>
+      <button data-tab="map" aria-label="Map"><svg class="ic" data-icon="map"></svg><span>Map</span></button>
+      <button data-tab="stats" aria-label="Stats"><svg class="ic" data-icon="chart"></svg><span>Stats</span></button>
+    </nav>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sheet-grabber"></div>
+    <button class="glass-btn sheet-close" id="sheetClose" aria-label="Close"><svg class="ic" data-icon="x"></svg></button>
+    <div class="sheet-scroll" id="sheetScroll"></div>
+  </div>
+
+  <div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

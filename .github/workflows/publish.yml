@@ -1,0 +1,39 @@
+name: Publish to main
+
+# Anything pushed to a claude/* branch is checked and merged into main,
+# which is what GitHub Pages serves. No manual merging needed.
+on:
+  push:
+    branches: ['claude/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate guide data
+        run: node scripts/validate.mjs
+
+      - name: Merge into main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin main > /dev/null; then
+            git fetch origin main
+            git checkout -B main origin/main
+            git merge --no-edit "$GITHUB_SHA"
+          else
+            git checkout -B main "$GITHUB_SHA"
+          fi
+          git push origin main
