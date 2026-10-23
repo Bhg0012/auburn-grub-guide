@@ -35,6 +35,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
   "category": "Breakfast",            // one word or two: Breakfast, Sushi, Burgers, Pizza, Mexican, BBQ, Coffee...
   "price": "$$",                      // $ to $$$$
   "rating": 4.1,                      // exactly what the user said
+  "verdict": "Must-go",               // optional: only when the user calls it that; overrides the rating-based label
   "comments": ["...", "..."],         // the user's own words, lightly cleaned up, one thought per bubble
   "mustTry": [],                      // only dishes the user recommended
   "tags": ["All You Can Eat"],        // 2-3 short facts worth scanning for
@@ -62,4 +63,4 @@ Editing or removing a spot works the same way: change `data/places.json` (and ph
 
 - Live site: https://bhg0012.github.io/auburn-grub-guide/ (GitHub Pages, source: `main` branch, root folder)
 - Maps use MapLibre GL + OpenFreeMap vector tiles (free, no key). CARTO raster tiles now require an API key, so don't switch back to them.
-- Ratings: verdict labels are 5 Perfect, 4.5+ Must-go, 4+ Great, 3+ Solid, 2+ Meh, below that Skip it.
+- Ratings: verdict labels are 5 Perfect, 4.5+ Must-go, 4+ Great, 3+ Solid, 2+ Meh, below that Skip it. A place's `verdict` field overrides this (Sushi Kingdom is 4.3 but the user called it a must-go). Must-go/Perfect get a highlighted badge and count toward the Must-gos stat.

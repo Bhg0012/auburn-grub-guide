@@ -69,6 +69,10 @@
 
   const fmtRating = (r) => (Math.round(r * 10) / 10).toFixed(1);
 
+  // A place can override the rating-based label with its own "verdict".
+  const verdictOf = (p) => p.verdict || verdict(p.rating);
+  const isMustGo = (p) => ['Must-go', 'Perfect'].includes(verdictOf(p));
+
   function verdict(r) {
     if (r >= 5) return 'Perfect';
     if (r >= 4.5) return 'Must-go';
@@ -263,7 +267,7 @@
           <div class="card-body">
             <div class="card-title-row">
               <h3 class="card-title">${esc(p.name)}</h3>
-              <span class="verdict">${verdict(p.rating)}</span>
+              <span class="verdict ${isMustGo(p) ? 'hot' : ''}">${verdictOf(p)}</span>
             </div>
             <p class="card-meta">${metaLine(p)}</p>
             ${p.comments[0] ? `<p class="card-quote">${esc(p.comments[0])}</p>` : ''}
@@ -305,7 +309,7 @@
       return;
     }
     const avg = ps.reduce((s, p) => s + p.rating, 0) / ps.length;
-    const fives = ps.filter((p) => p.rating >= 4.5).length;
+    const fives = ps.filter(isMustGo).length;
     const top = ranked();
 
     const buckets = [5, 4, 3, 2, 1].map((b) => ({ b, n: ps.filter((p) => Math.max(1, Math.floor(p.rating)) === b).length }));
@@ -427,10 +431,12 @@
   const mapStyle = () => (darkQuery.matches ? MAP_STYLES.dark : MAP_STYLES.light);
   const hasCoords = (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng);
 
-  function pinEl(p, i) {
+  function pinEl(p, i, compact = false) {
     const el = document.createElement('div');
     el.className = 'pin';
-    el.innerHTML = `<div class="pin-w" style="--n:${i}"><div class="pin-b">${starSolid()}${fmtRating(p.rating)}</div></div>`;
+    el.innerHTML = compact
+      ? `<div class="pin-w" style="--n:${i}"><div class="pin-b">${starSolid()}${fmtRating(p.rating)}</div></div>`
+      : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${photo(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div><div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div></div></div></div>`;
     return el;
   }
 
@@ -493,7 +499,7 @@
     const gl = window.maplibregl;
     const pts = state.places.filter(hasCoords);
     if (!gl || !mapState.map || !pts.length) return;
-    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 120, bottom: 200, left: 60, right: 60 }, maxZoom: 15 };
+    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 150, bottom: 190, left: 110, right: 110 }, maxZoom: 15 };
     if (pts.length === 1) { mapState.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: opts.duration }); return; }
     const b = new gl.LngLatBounds();
     pts.forEach((p) => b.extend([p.lng, p.lat]));
@@ -725,7 +731,7 @@
           <div class="score-num">${fmtRating(p.rating)}<small>/5</small></div>
           <div class="score-side">
             ${stars(p.rating, 'pop')}
-            <span class="score-verdict">Our verdict: ${verdict(p.rating)}</span>
+            <span class="score-verdict">Our verdict: ${verdictOf(p)}</span>
           </div>
         </div>
 
@@ -787,7 +793,7 @@
             container: host, style: mapStyle(), center: [p.lng, p.lat], zoom: 15.2,
             interactive: false, attributionControl: false, fadeDuration: 0,
           });
-          new gl.Marker({ element: pinEl(p, 3), anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(m);
+          new gl.Marker({ element: pinEl(p, 3, true), anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(m);
           sheet.mini = m;
         }, 420);
       }).catch(() => { $('.minimap')?.remove(); });

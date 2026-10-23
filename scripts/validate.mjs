@@ -30,6 +30,7 @@ for (const [i, p] of places.entries()) {
   if (ids.has(p.id)) errors.push(`${at}: duplicate id "${p.id}"`);
   ids.add(p.id);
   if (typeof p.rating !== 'number' || p.rating < 0 || p.rating > 5) errors.push(`${at}: "rating" must be a number from 0 to 5`);
+  if (p.verdict && !['Perfect', 'Must-go', 'Great', 'Solid', 'Meh', 'Skip it'].includes(p.verdict)) errors.push(`${at}: "verdict" must be Perfect, Must-go, Great, Solid, Meh or Skip it`);
   if (!p.category) warnings.push(`${at}: no "category"`);
   if (!Array.isArray(p.comments) || !p.comments.length) warnings.push(`${at}: no "comments"`);
   if (p.added && Number.isNaN(Date.parse(p.added))) errors.push(`${at}: "added" is not a date`);
