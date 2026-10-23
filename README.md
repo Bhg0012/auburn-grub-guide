@@ -8,7 +8,7 @@ On iPhone, open the link in Safari, tap Share, then **Add to Home Screen**. It l
 
 ## Adding a spot
 
-Tell Claude the place, your rating out of 5, and a comment or two. Claude finds the photos, address, hours and map location, adds it to `data/places.json`, and publishes. The site updates a minute or two later.
+Tell Claude the place, your rating out of 10, and a comment or two. Claude finds the photos, address, hours and map location, adds it to `data/places.json`, and publishes. The site updates a minute or two later.
 
 ## How it's built
 

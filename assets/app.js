@@ -58,13 +58,14 @@
     });
   }
 
+  // Ratings are out of 10; stars show half of that out of 5.
   function stars(rating, cls = '') {
     let out = '';
     for (let i = 0; i < 5; i++) {
-      const f = clamp(rating - i, 0, 1) * 100;
+      const f = clamp(rating / 2 - i, 0, 1) * 100;
       out += `<span class="star" style="--f:${f}%;--n:${i}"><svg viewBox="0 0 24 24"><path d="${STAR}"/></svg><svg class="on" viewBox="0 0 24 24"><path d="${STAR}"/></svg></span>`;
     }
-    return `<span class="stars ${cls}" role="img" aria-label="${rating} out of 5 stars">${out}</span>`;
+    return `<span class="stars ${cls}" role="img" aria-label="${rating} out of 10">${out}</span>`;
   }
 
   const fmtRating = (r) => (Math.round(r * 10) / 10).toFixed(1);
@@ -74,11 +75,12 @@
   const isMustGo = (p) => ['Must-go', 'Perfect'].includes(verdictOf(p));
 
   function verdict(r) {
-    if (r >= 5) return 'Perfect';
-    if (r >= 4.5) return 'Must-go';
-    if (r >= 4) return 'Great';
-    if (r >= 3) return 'Solid';
-    if (r >= 2) return 'Meh';
+    if (r >= 10) return 'Perfect';
+    if (r >= 9) return 'Must-go';
+    if (r >= 8) return 'Great';
+    if (r >= 7) return 'Good';
+    if (r >= 6) return 'Solid';
+    if (r >= 4) return 'Meh';
     return 'Skip it';
   }
 
@@ -157,7 +159,7 @@
       .map((p) => ({
         ...p,
         id: p.id || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-        rating: clamp(Number(p.rating) || 0, 0, 5),
+        rating: clamp(Number(p.rating) || 0, 0, 10),
         comments: Array.isArray(p.comments) ? p.comments : p.comments ? [p.comments] : [],
         photos: Array.isArray(p.photos) ? p.photos : [],
         mustTry: Array.isArray(p.mustTry) ? p.mustTry : [],
@@ -312,7 +314,8 @@
     const fives = ps.filter(isMustGo).length;
     const top = ranked();
 
-    const buckets = [5, 4, 3, 2, 1].map((b) => ({ b, n: ps.filter((p) => Math.max(1, Math.floor(p.rating)) === b).length }));
+    const buckets = [['9+', 9, 11], ['8', 8, 9], ['7', 7, 8], ['6', 6, 7], ['<6', -1, 6]]
+      .map(([b, lo, hi]) => ({ b, n: ps.filter((p) => p.rating >= lo && p.rating < hi).length }));
     const maxB = Math.max(1, ...buckets.map((x) => x.n));
 
     const cats = categories().map(([c, n]) => {
@@ -360,7 +363,7 @@
         <div class="dist">
           ${buckets.map((x, i) => `
             <div class="dist-row">
-              <span class="dist-label">${x.b}${starSolid()}</span>
+              <span class="dist-label">${x.b}</span>
               <div class="dist-track"><div class="dist-fill" style="--w:${x.n / maxB};--n:${i}"></div></div>
               <span class="dist-count">${x.n}</span>
             </div>`).join('')}
@@ -374,7 +377,7 @@
           <div class="cat-row">
             <span class="cat-name">${esc(c.c)}</span>
             <span class="cat-meta">${c.n} ${c.n === 1 ? 'spot' : 'spots'} &middot; <b>${fmtRating(c.avg)}</b></span>
-            <div class="dist-track"><div class="dist-fill" style="--w:${c.avg / 5};--n:${i}"></div></div>
+            <div class="dist-track"><div class="dist-fill" style="--w:${c.avg / 10};--n:${i}"></div></div>
           </div>`).join('')}
       </div>` : ''}
 
@@ -436,7 +439,7 @@
     el.className = 'pin';
     el.innerHTML = compact
       ? `<div class="pin-w" style="--n:${i}"><div class="pin-b">${starSolid()}${fmtRating(p.rating)}</div></div>`
-      : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${photo(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div><div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div></div></div></div>`;
+      : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${photo(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div><div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div></div><span class="pin-more"></span></div></div>`;
     return el;
   }
 
@@ -465,6 +468,12 @@
       map.touchZoomRotate.disableRotation();
       map.addControl(new gl.AttributionControl({ compact: true }), 'bottom-left');
       map.on('click', () => selectPin(null));
+      let queued = false;
+      map.on('move', () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; declutter(); });
+      });
       mapState.map = map;
     }
     drawPins();
@@ -487,19 +496,63 @@
     pts.slice().reverse().forEach((p, i) => {
       const el = pinEl(p, i);
       el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', `${p.name}, ${fmtRating(p.rating)} stars`);
-      el.addEventListener('click', (e) => { e.stopPropagation(); selectPin(p.id); });
+      el.setAttribute('aria-label', `${p.name}, rated ${fmtRating(p.rating)} out of 10`);
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (el.cluster && el.cluster.length > 1 && map.getZoom() < 16.5) zoomToCluster(el.cluster);
+        else selectPin(p.id);
+      });
       const m = new gl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(map);
+      el.fullWidth = el.offsetWidth;
       mapState.markers.set(p.id, m);
     });
     fitMap(false);
+    declutter();
+  }
+
+  /* Pins that would overlap fold into the best-rated one nearby, which shows a "+N" badge. */
+  function declutter() {
+    const { map } = mapState;
+    if (!map) return;
+    const order = state.places.filter((p) => hasCoords(p) && mapState.markers.has(p.id)).sort(byTop);
+    if (mapState.selected) order.sort((a, b) => (b.id === mapState.selected) - (a.id === mapState.selected));
+    const groups = [];
+    order.forEach((p) => {
+      const el = mapState.markers.get(p.id).getElement();
+      const pt = map.project([p.lng, p.lat]);
+      const w = (el.fullWidth || 170) + 8;
+      const box = { l: pt.x - w / 2, r: pt.x + w / 2, t: pt.y - 58, b: pt.y };
+      const owner = groups.find((g) => box.l < g.box.r && box.r > g.box.l && box.t < g.box.b && box.b > g.box.t);
+      if (owner) {
+        owner.members.push(p);
+        el.classList.add('is-hidden');
+      } else {
+        groups.push({ box, el, members: [p] });
+        el.classList.remove('is-hidden');
+      }
+    });
+    groups.forEach((g) => {
+      const n = g.members.length - 1;
+      g.el.cluster = g.members;
+      g.el.classList.toggle('has-more', n > 0);
+      const badge = $('.pin-more', g.el);
+      if (badge) badge.textContent = n > 0 ? `+${n}` : '';
+    });
+  }
+
+  function zoomToCluster(members) {
+    const gl = window.maplibregl;
+    const b = new gl.LngLatBounds();
+    members.forEach((p) => b.extend([p.lng, p.lat]));
+    haptic();
+    mapState.map.fitBounds(b, { padding: { top: 150, bottom: 190, left: 90, right: 90 }, maxZoom: 17.5, duration: 800 });
   }
 
   function fitMap(animate = true) {
     const gl = window.maplibregl;
     const pts = state.places.filter(hasCoords);
     if (!gl || !mapState.map || !pts.length) return;
-    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 150, bottom: 190, left: 110, right: 110 }, maxZoom: 15 };
+    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 90, right: 90 }, maxZoom: 15 };
     if (pts.length === 1) { mapState.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: opts.duration }); return; }
     const b = new gl.LngLatBounds();
     pts.forEach((p) => b.extend([p.lng, p.lat]));
@@ -511,10 +564,11 @@
     if (prev) prev.getElement().classList.remove('is-selected');
     mapState.selected = id;
     const preview = $('#mapPreview');
-    if (!id) { preview.classList.remove('is-shown'); return; }
+    if (!id) { preview.classList.remove('is-shown'); declutter(); return; }
     const m = mapState.markers.get(id);
     const p = state.byId.get(id);
     if (m) m.getElement().classList.add('is-selected');
+    declutter();
     haptic();
     preview.innerHTML = `
       <a class="map-card" href="#/p/${esc(p.id)}">
@@ -728,7 +782,7 @@
         </div>
 
         <div class="score">
-          <div class="score-num">${fmtRating(p.rating)}<small>/5</small></div>
+          <div class="score-num">${fmtRating(p.rating)}<small>/10</small></div>
           <div class="score-side">
             ${stars(p.rating, 'pop')}
             <span class="score-verdict">Our verdict: ${verdictOf(p)}</span>
@@ -802,7 +856,7 @@
 
   /* ---------- Add sheet ---------- */
 
-  const TEMPLATE = 'Add to the Grub Guide: [place name], [rating]/5. [what we thought]';
+  const TEMPLATE = 'Add to the Grub Guide: [place name], [rating]/10. [what we thought]';
 
   function openAdd() {
     openSheet('add', `
@@ -812,10 +866,10 @@
         <p>Just tell Claude. It does the legwork and the guide updates itself.</p>
         <div class="steps">
           <div class="step"><span class="step-n">1</span><p>Open the Claude chat for this guide.<br><span>The same one that built it.</span></p></div>
-          <div class="step"><span class="step-n">2</span><p>Send the place, your rating out of 5, and a note or two.</p></div>
+          <div class="step"><span class="step-n">2</span><p>Send the place, your rating out of 10, and a note or two.</p></div>
           <div class="step"><span class="step-n">3</span><p>Claude finds photos, the address and details, then publishes.<br><span>Refresh in a minute or two.</span></p></div>
         </div>
-        <div class="template">Add to the Grub Guide: <em>Momma Goldberg’s</em>, <em>4.5/5</em>. <em>The Momma’s sub is unreal. Go for the fries too.</em></div>
+        <div class="template">Add to the Grub Guide: <em>Momma Goldberg’s</em>, <em>8.5/10</em>. <em>The Momma’s sub is unreal. Go for the fries too.</em></div>
         <button class="btn btn-tinted btn-block" data-copy>${icon('copy')}Copy a template</button>
       </div>`, { compact: true });
   }
@@ -825,7 +879,7 @@
   const spin = { cancel: null };
 
   function weightedPick(list) {
-    const w = list.map((p) => Math.pow(Math.max(0.3, p.rating - 1.5), 2.2));
+    const w = list.map((p) => Math.pow(Math.max(0.3, p.rating / 2 - 1.5), 2.2));
     let r = Math.random() * w.reduce((a, b) => a + b, 0);
     for (let i = 0; i < list.length; i++) { r -= w[i]; if (r <= 0) return list[i]; }
     return list[list.length - 1];
@@ -913,7 +967,7 @@
     const p = state.byId.get(id);
     if (!p) return;
     const url = `${location.origin}${location.pathname}#/p/${encodeURIComponent(p.id)}`;
-    const text = `${p.name}: ${fmtRating(p.rating)}/5 on our Auburn Grub Guide`;
+    const text = `${p.name}: ${fmtRating(p.rating)}/10 on our Auburn Grub Guide`;
     try {
       if (navigator.share) { await navigator.share({ title: p.name, text, url }); return; }
       await navigator.clipboard.writeText(`${text}\n${url}`);

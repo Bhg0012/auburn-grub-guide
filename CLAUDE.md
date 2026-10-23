@@ -11,7 +11,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 
 ## Standing instructions from the user
 
-- When the user names a place, a rating out of 5 and some comments, add it to the guide. Do the research yourself (photos, address, hours, phone, website, coordinates). Don't ask follow-up questions unless the place can't be identified.
+- When the user names a place, a rating out of 10 and some comments, add it to the guide. Do the research yourself (photos, address, hours, phone, website, coordinates). Don't ask follow-up questions unless the place can't be identified.
 - **Always publish without being asked**: commit, push the working branch, and also push to `main` (`git push origin HEAD:main`, or merge if `main` moved). The user has given standing permission for this; they should never have to merge anything by hand.
 - Never use em dashes in anything user-facing (comments, blurbs, UI copy). Use a plain dash or rephrase.
 - Keep the design clean and Apple-like. No emoji in the UI.
@@ -34,7 +34,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
   "name": "Official Name",
   "category": "Breakfast",            // one word or two: Breakfast, Sushi, Burgers, Pizza, Mexican, BBQ, Coffee...
   "price": "$$",                      // $ to $$$$
-  "rating": 4.1,                      // exactly what the user said
+  "rating": 8.2,                      // out of 10, exactly what the user said (stars show half of it)
   "verdict": "Must-go",               // optional: only when the user calls it that; overrides the rating-based label
   "comments": ["...", "..."],         // the user's own words, lightly cleaned up, one thought per bubble
   "mustTry": [],                      // only dishes the user recommended
@@ -53,9 +53,10 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 }
 ```
 
+   Chains or places with several locations ("so many locations", "multiple on campus"): pin the one the user named, or the most central one, and list the others in the blurb.
    Keep the user's comments in their voice. Don't invent opinions, dishes they "loved", or visit dates.
 6. **Check it:** `node scripts/validate.mjs`. To eyeball it, serve the folder (`http-server -p 8080 -c-1 .`) and screenshot with Playwright at 393x852 (Chromium is preinstalled).
-7. **Publish:** commit (`Add <Place> (<rating>/5)`), `git push -u origin <branch>`, then `git push origin HEAD:main`. GitHub Pages updates within a minute or two.
+7. **Publish:** commit (`Add <Place> (<rating>/10)`), `git push -u origin <branch>`, then `git push origin HEAD:main`. GitHub Pages updates within a minute or two.
 
 Editing or removing a spot works the same way: change `data/places.json` (and photos), validate, commit, push both.
 
@@ -63,4 +64,4 @@ Editing or removing a spot works the same way: change `data/places.json` (and ph
 
 - Live site: https://bhg0012.github.io/auburn-grub-guide/ (GitHub Pages, source: `main` branch, root folder)
 - Maps use MapLibre GL + OpenFreeMap vector tiles (free, no key). CARTO raster tiles now require an API key, so don't switch back to them.
-- Ratings: verdict labels are 5 Perfect, 4.5+ Must-go, 4+ Great, 3+ Solid, 2+ Meh, below that Skip it. A place's `verdict` field overrides this (Sushi Kingdom is 4.3 but the user called it a must-go). Must-go/Perfect get a highlighted badge and count toward the Must-gos stat.
+- Ratings are out of 10 (the user switched from 5; the first two spots were doubled: 4.1 -> 8.2, 4.3 -> 8.6). Stars display rating / 2. Verdict labels: 10 Perfect, 9+ Must-go, 8+ Great, 7+ Good, 6+ Solid, 4+ Meh, below that Skip it. A place's `verdict` field overrides this (Sushi Kingdom is 8.6 but the user called it a must-go). Must-go/Perfect get a highlighted badge and count toward the Must-gos stat.

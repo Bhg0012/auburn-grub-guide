@@ -5,13 +5,17 @@
       "name": "Flying Biscuit Café",
       "category": "Breakfast",
       "price": "$$",
-      "rating": 4.1,
+      "rating": 8.2,
       "comments": [
         "Unique breakfast options you don't always see.",
         "They serve breakfast until 2pm, which is good. Most other places stop serving by then."
       ],
       "mustTry": [],
-      "tags": ["Breakfast til 2", "Brunch", "Patio"],
+      "tags": [
+        "Breakfast til 2",
+        "Brunch",
+        "Patio"
+      ],
       "added": "2026-10-23T20:30:00",
       "blurb": "Southern breakfast and brunch café that started in Atlanta, known for fluffy biscuits with cranberry apple butter, moon dusted potatoes, chicken and waffles, and shrimp and grits. The Tiger Town location opened in December 2022 with a dining room and a patio.",
       "address": "2524 Enterprise Dr, Opelika, AL 36801",
@@ -35,7 +39,7 @@
       "name": "Sushi Kingdom",
       "category": "Sushi",
       "price": "$$",
-      "rating": 4.3,
+      "rating": 8.6,
       "verdict": "Must-go",
       "comments": [
         "All you can eat sushi, and it's fresh.",
@@ -45,7 +49,11 @@
         "Our waiter was super nice."
       ],
       "mustTry": [],
-      "tags": ["All You Can Eat", "Robot servers", "Hibachi"],
+      "tags": [
+        "All You Can Eat",
+        "Robot servers",
+        "Hibachi"
+      ],
       "added": "2026-10-23T20:45:00",
       "blurb": "All-you-can-eat sushi and hibachi spot on Pepperell Parkway that opened in summer 2026. Rolls, nigiri and sashimi are made to order and delivered to your table by robot, with a hot bar for appetizers. AYCE tiers are Silver $23.99 (no cold bar), Gold $31.99 (no crab legs) and Diamond $38.99 (full menu) per person.",
       "address": "2820 Pepperell Pkwy, Opelika, AL 36801",
@@ -60,6 +68,334 @@
         "images/places/sushi-kingdom/4.jpg"
       ],
       "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "hattie-bs",
+      "name": "Hattie B's Hot Chicken",
+      "category": "Chicken",
+      "price": "$$",
+      "rating": 6.8,
+      "comments": [
+        "Not bad, and it's open late downtown.",
+        "Pretty salty. Good, but expensive.",
+        "Not our first choice for chicken.",
+        "The pimento mac n cheese is really good.",
+        "The chewable ice is good too."
+      ],
+      "mustTry": [
+        "Pimento mac n cheese"
+      ],
+      "tags": [
+        "Open late",
+        "Nashville hot chicken",
+        "Patio"
+      ],
+      "added": "2026-10-23T21:30:00",
+      "blurb": "Nashville hot chicken spot that opened in July 2026 in the old Tiger Theatre building on College Street, across from campus near Toomer's Drugs. Chicken comes in heat levels from Southern (no heat) up to Shut the Cluck Up, with Southern sides and a covered patio out front.",
+      "address": "121 N College St, Auburn, AL 36830",
+      "area": "Downtown",
+      "lat": 32.6085134,
+      "lng": -85.4818472,
+      "website": "https://hattieb.com",
+      "hours": "Sun-Thu 10:45am-10pm, Fri-Sat 10:45am-11pm",
+      "photos": [
+        "images/places/hattie-bs/1.jpg",
+        "images/places/hattie-bs/2.jpg",
+        "images/places/hattie-bs/3.jpg",
+        "images/places/hattie-bs/4.jpg",
+        "images/places/hattie-bs/5.jpg"
+      ],
+      "photoCredit": "Hattie B's and The Auburn Villager"
+    },
+    {
+      "id": "ronis-mac-bar",
+      "name": "Roni's Mac Bar",
+      "category": "Mac & Cheese",
+      "price": "$$",
+      "rating": 7.6,
+      "comments": [
+        "Open late downtown.",
+        "On the more expensive side, but unique.",
+        "Portions aren't as big as you'd hope.",
+        "Great quality.",
+        "Quick service.",
+        "Lots of options, very customizable."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Open late",
+        "Build your own",
+        "Grilled cheese"
+      ],
+      "added": "2026-10-23T21:31:00",
+      "blurb": "Build-your-own mac and cheese bar that started in Waco, Texas and blew up on TikTok. The College Street shop opened in June 2025 as the first Roni's in Alabama, serving mac bowls and grilled cheese with your pick of meats, toppings and sauces, and stays open until 2am on football weekends.",
+      "address": "138 N College St, Auburn, AL 36830",
+      "area": "Downtown",
+      "lat": 32.6075984,
+      "lng": -85.481412,
+      "website": "https://www.ronismacbar.com",
+      "photos": [
+        "images/places/ronis-mac-bar/1.jpg",
+        "images/places/ronis-mac-bar/2.jpg",
+        "images/places/ronis-mac-bar/3.jpg"
+      ],
+      "photoCredit": "Roni's Mac Bar and The Auburn Villager"
+    },
+    {
+      "id": "guthries-downtown",
+      "name": "Guthrie's",
+      "category": "Chicken",
+      "price": "$",
+      "rating": 7.0,
+      "comments": [
+        "Ole reliable.",
+        "They don't do anything that great or that bad.",
+        "Open late downtown and always a fun experience. You see people you know.",
+        "Creates stories.",
+        "Good sauce.",
+        "Service is hit or miss."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Open late",
+        "Chicken fingers",
+        "Auburn original"
+      ],
+      "added": "2026-10-23T21:32:00",
+      "blurb": "Chicken finger joint that's been an Auburn staple since 1982, when the Guthrie family brought it down from Haleyville, Alabama. Known for fingers, fries, Texas toast and the signature Guthrie's sauce. This is the downtown location on Glenn Ave, just off Toomer's Corner.",
+      "address": "129 E Glenn Ave, Auburn, AL 36830",
+      "area": "Downtown",
+      "lat": 32.6093608,
+      "lng": -85.4811547,
+      "website": "https://guthrieschicken.com",
+      "photos": [
+        "images/places/guthries-downtown/1.jpg",
+        "images/places/guthries-downtown/2.jpg"
+      ],
+      "photoCredit": "Guthrie's"
+    },
+    {
+      "id": "chipotle-magnolia",
+      "name": "Chipotle",
+      "category": "Mexican",
+      "price": "$",
+      "rating": 7.3,
+      "comments": [
+        "Like most Chipotles, so you know what you're getting for the most part.",
+        "Really convenient location.",
+        "Service is hit or miss, and there can be a huge line sometimes.",
+        "Sometimes they're out of an ingredient."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Across from campus",
+        "Open til 11"
+      ],
+      "added": "2026-10-23T21:33:00",
+      "blurb": "The Chipotle on Magnolia, across from campus at Thomas St. Burritos, bowls, tacos and quesadillas built down the line, open every day until 11pm.",
+      "address": "346 W Magnolia Ave, Auburn, AL 36832",
+      "area": "W Magnolia",
+      "lat": 32.606813,
+      "lng": -85.4873283,
+      "phone": "(334) 821-7740",
+      "website": "https://locations.chipotle.com/al/auburn/346-w-magnolia-ave",
+      "hours": "Daily 10:45am-11pm",
+      "photos": [
+        "images/places/chipotle-magnolia/1.jpg",
+        "images/places/chipotle-magnolia/2.jpg",
+        "images/places/chipotle-magnolia/3.jpg",
+        "images/places/chipotle-magnolia/4.jpg"
+      ],
+      "photoCredit": "Chipotle"
+    },
+    {
+      "id": "firehouse-subs",
+      "name": "Firehouse Subs",
+      "category": "Subs",
+      "price": "$",
+      "rating": 7.4,
+      "comments": [
+        "A little out of the way, but good if you're near the highway.",
+        "Good service.",
+        "Always good quality food.",
+        "Clean restaurant.",
+        "Pretty consistent."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Near I-85",
+        "Hot subs"
+      ],
+      "added": "2026-10-23T21:34:00",
+      "blurb": "Hot sub chain started by firefighter brothers in Jacksonville, Florida, known for steamed meats and melted cheese on toasted rolls. This one is on South College near the I-85 interchange.",
+      "address": "1907 S College St, Suite 108, Auburn, AL 36832",
+      "area": "South College",
+      "lat": 32.5707116,
+      "lng": -85.4995133,
+      "phone": "(334) 887-6400",
+      "website": "https://www.firehousesubs.com",
+      "photos": [
+        "images/places/firehouse-subs/1.jpg",
+        "images/places/firehouse-subs/2.jpg",
+        "images/places/firehouse-subs/3.jpg",
+        "images/places/firehouse-subs/4.jpg"
+      ],
+      "photoCredit": "Firehouse Subs"
+    },
+    {
+      "id": "toro-sushi",
+      "name": "Toro Sushi",
+      "category": "Sushi",
+      "price": "$$",
+      "rating": 7.1,
+      "comments": [
+        "Pretty solid quality.",
+        "Very fast service. Sometimes it's ready in 1-2 minutes.",
+        "Multiple locations on campus.",
+        "Expensive for the amount you get.",
+        "Fully customizable poke bowls and sushi."
+      ],
+      "mustTry": [],
+      "tags": [
+        "On campus",
+        "Build your own",
+        "Poke bowls"
+      ],
+      "added": "2026-10-23T21:35:00",
+      "blurb": "Campus sushi counter with spots in the Melton Student Center and the Village. Build your own sushi rolls or poke bowls, or grab Asian staples like teriyaki chicken and lo mein.",
+      "address": "Melton Student Center, 255 Heisman Dr, Auburn, AL 36849",
+      "area": "Campus",
+      "lat": 32.6020469,
+      "lng": -85.4869481,
+      "photos": [
+        "images/places/toro-sushi/1.jpg",
+        "images/places/toro-sushi/2.jpg"
+      ],
+      "photoCredit": "Sushi Seek and The Auburn Plainsman"
+    },
+    {
+      "id": "chick-fil-a",
+      "name": "Chick-fil-A",
+      "category": "Chicken",
+      "price": "$",
+      "rating": 8.1,
+      "comments": [
+        "So many locations.",
+        "Always amazing service.",
+        "Not too expensive.",
+        "Consistent food quality."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Many locations",
+        "Closed Sundays"
+      ],
+      "added": "2026-10-23T21:36:00",
+      "blurb": "The chicken sandwich chain everyone knows, with locations all over Auburn: W Magnolia by campus, Opelika Rd, E University Dr, the Village and the Student Center. The pin is the W Magnolia drive-thru, open Monday to Saturday and closed Sundays.",
+      "address": "326 W Magnolia Ave, Auburn, AL 36832",
+      "area": "W Magnolia",
+      "lat": 32.6067171,
+      "lng": -85.4864362,
+      "phone": "(334) 826-7630",
+      "website": "https://www.chick-fil-a.com/locations/al/auburn-in-line-dt",
+      "hours": "Mon-Sat 6am-10pm, Sun closed",
+      "photos": [
+        "images/places/chick-fil-a/1.jpg",
+        "images/places/chick-fil-a/2.jpg",
+        "images/places/chick-fil-a/3.jpg",
+        "images/places/chick-fil-a/4.jpg"
+      ],
+      "photoCredit": "Chick-fil-A"
+    },
+    {
+      "id": "the-edge",
+      "name": "The Edge",
+      "category": "Dining Hall",
+      "price": "$$",
+      "rating": 7.4,
+      "comments": [
+        "Amazing breakfast.",
+        "All you can eat, with lots and lots of choices.",
+        "Quality is hit or miss.",
+        "The workers are not great.",
+        "About $14 to eat without using a swipe.",
+        "You're not going here for quality, you're going here for options."
+      ],
+      "mustTry": [],
+      "tags": [
+        "All you can eat",
+        "On campus",
+        "Great breakfast"
+      ],
+      "added": "2026-10-23T21:37:00",
+      "blurb": "Auburn's main all-you-care-to-eat dining hall at Central Dining, by the Stadium Parking Deck and Parker Hall. It opened in 2021 with eight food stations serving breakfast, lunch and dinner seven days a week. Students use meal plan swipes; everyone else pays at the door.",
+      "address": "341 Duncan Dr, Auburn, AL 36849",
+      "area": "Campus",
+      "lat": 32.6002819,
+      "lng": -85.4875057,
+      "photos": [
+        "images/places/the-edge/1.jpg",
+        "images/places/the-edge/2.jpg"
+      ],
+      "photoCredit": "The Auburn Plainsman"
+    },
+    {
+      "id": "village-dining",
+      "name": "Village Dining Hall",
+      "category": "Dining Hall",
+      "price": "$$",
+      "rating": 7.4,
+      "comments": [
+        "Nicer workers than The Edge.",
+        "Fewer choices than The Edge, but higher quality food."
+      ],
+      "mustTry": [],
+      "tags": [
+        "All you can eat",
+        "On campus",
+        "Tiger Zone"
+      ],
+      "added": "2026-10-23T21:38:00",
+      "blurb": "Tiger Zone, the all-you-care-to-eat dining hall in the Village dining building on the west side of campus. It got a $3.8 million renovation in 2019 with a new kitchen and community-style seating. Meal plan swipes and block meals work here, same as The Edge.",
+      "address": "230 Beard-Eaves Ct, Auburn, AL 36849",
+      "area": "Campus",
+      "lat": 32.603826,
+      "lng": -85.491971,
+      "photos": [
+        "images/places/village-dining/1.jpg"
+      ],
+      "photoCredit": "Auburn Campus Dining (rendering)"
+    },
+    {
+      "id": "einstein-bros",
+      "name": "Einstein Bros. Bagels",
+      "category": "Bagels",
+      "price": "$$",
+      "rating": 6.9,
+      "comments": [
+        "On the expensive side for what you get.",
+        "Good quality, and unique."
+      ],
+      "mustTry": [],
+      "tags": [
+        "On campus",
+        "Breakfast",
+        "Coffee"
+      ],
+      "added": "2026-10-23T21:39:00",
+      "blurb": "Bagel and coffee shop on the ground floor of Haley Center, across from the University Bookstore. Students voted it onto campus in 2016 and it opened in 2017, serving bagels with flavored cream cheeses, breakfast and lunch sandwiches, and espresso drinks.",
+      "address": "Haley Center, 351 W Thach Concourse, Auburn, AL 36849",
+      "area": "Campus",
+      "lat": 32.603779,
+      "lng": -85.4868767,
+      "website": "https://www.einsteinbros.com",
+      "photos": [
+        "images/places/einstein-bros/1.jpg",
+        "images/places/einstein-bros/2.jpg",
+        "images/places/einstein-bros/3.jpg",
+        "images/places/einstein-bros/4.jpg"
+      ],
+      "photoCredit": "Einstein Bros. Bagels and The Auburn Plainsman"
     }
   ]
 }

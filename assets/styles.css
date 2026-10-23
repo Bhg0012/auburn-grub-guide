@@ -1462,7 +1462,6 @@ a.row .row-value { color: var(--accent); }
 }
 
 .pin { cursor: pointer; }
-.pin.is-selected { z-index: 2; }
 .pin-w {
   padding-bottom: 6px;
   animation: pinDrop 0.6s var(--ease-spring) both;
@@ -1515,14 +1514,14 @@ a.row .row-value { color: var(--accent); }
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 190px;
+  max-width: 220px;
   padding: 4px 12px 4px 4px;
   border-radius: 24px;
   background: var(--surface);
   color: var(--label);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.12);
   transform-origin: 50% calc(100% + 7px);
-  transition: transform 0.35s var(--ease-spring), background-color 0.2s, color 0.2s;
+  transition: transform 0.35s var(--ease-spring), opacity 0.2s ease, background-color 0.2s, color 0.2s;
 }
 .pin-card::after {
   content: "";
@@ -1567,6 +1566,32 @@ a.row .row-value { color: var(--accent); }
 .pin.is-selected .pin-card::after { border-top-color: var(--accent); }
 .pin.is-selected .pin-score { color: #fff; }
 .pin.is-selected .pin-card .ph { box-shadow: 0 0 0 2px #fff; }
+.pin { z-index: 1; }
+.pin.is-selected { z-index: 2; }
+.pin.is-hidden { pointer-events: none; }
+.pin.is-hidden .pin-card { opacity: 0; transform: scale(0.6); }
+.pin-more {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 12px;
+  display: none;
+  place-items: center;
+  font-family: var(--font-round);
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--navy);
+  box-shadow: 0 0 0 2px var(--surface), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.pin.has-more .pin-more { display: grid; }
+.pin.has-more .pin-card { padding-right: 20px; }
+@media (prefers-color-scheme: dark) {
+  .pin-more { background: #fff; color: #000; }
+}
 
 .map-preview {
   position: absolute;
