@@ -1375,15 +1375,30 @@ a.row .row-value { color: var(--accent); }
 .lrow-title { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lrow-sub { font-size: 14px; color: var(--label-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lrow-score {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.lrow-num {
+  display: flex;
+  align-items: center;
+  gap: 3px;
   font-family: var(--font-round);
   font-weight: 800;
   font-size: 17px;
   color: var(--label);
-  display: flex;
-  align-items: center;
-  gap: 3px;
 }
 .lrow-score .star-solid { width: 14px; height: 14px; fill: var(--accent); }
+.lrow-score small {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--label-2);
+}
+.lrow-score small.hot { color: var(--accent); }
 .lrow .chev { width: 16px; height: 16px; color: var(--label-3); stroke-width: 2.4; }
 
 .medal {
@@ -1401,6 +1416,36 @@ a.row .row-value { color: var(--accent); }
 .medal.m1 { background: linear-gradient(160deg, #FFD54A, #E89B00); color: #3D2600; }
 .medal.m2 { background: linear-gradient(160deg, #EEF2F5, #9AA5B1); color: #22303D; }
 .medal.m3 { background: linear-gradient(160deg, #F0B07A, #B76A32); color: #3A1D06; }
+.medal.mn { background: var(--fill); color: var(--label-2); box-shadow: none; }
+
+.see-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 46px;
+  margin-top: 8px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.35s var(--ease-spring);
+}
+.see-all:active { transform: scale(0.97); }
+.see-all .ic { width: 16px; height: 16px; stroke-width: 2.5; }
+
+/* rankings sheet */
+.sheet.plain .sheet-grabber { background: var(--label-3); box-shadow: none; }
+.sheet.plain .sheet-close { background: var(--fill); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--label-2); }
+.ranks { padding: 30px var(--gutter) calc(30px + var(--safe-b)); }
+.ranks-title { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -0.03em; }
+.ranks-sub { margin-top: 4px; font-size: 15px; color: var(--label-2); }
+.ranks-list { margin-top: 18px; }
+.ranks-item { animation: rise 0.5s var(--ease-out) both; animation-delay: calc(0.12s + var(--n, 0) * 35ms); }
+.ranks-item + .ranks-item .lrow { border-top: 0.5px solid var(--sep); }
+.ranks .lrow { padding: 10px 0; }
+.ranks .lrow .medal { width: 28px; height: 28px; font-size: 14px; }
 
 .cat-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 9px 0; align-items: center; }
 .cat-row + .cat-row { border-top: 0.5px solid var(--sep); }
@@ -1596,7 +1641,12 @@ a.row .row-value { color: var(--accent); }
   box-shadow: 0 0 0 2px var(--surface), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 .pin.has-more .pin-more { display: grid; }
-.pin.has-more .pin-card { padding-right: 20px; }
+.pin.has-more:not(.is-compact) .pin-card { padding-right: 20px; }
+.pin.is-compact { z-index: 0; }
+.pin.is-compact .pin-card { padding: 2.5px; gap: 0; border-radius: 50%; }
+.pin.is-compact .pin-card .ph { width: 32px; height: 32px; }
+.pin.is-compact .pin-text { display: none; }
+.pin.is-compact .pin-more { top: -9px; right: -11px; }
 @media (prefers-color-scheme: dark) {
   .pin-more { background: #fff; color: #000; }
 }

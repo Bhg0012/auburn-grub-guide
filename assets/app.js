@@ -175,6 +175,25 @@
     return [...state.places].sort(byTop);
   }
 
+  // Ties share a rank (two 8.1s are both #2, the next spot is #4).
+  function rankMap() {
+    const list = ranked();
+    return new Map(list.map((p) => [p.id, 1 + list.filter((q) => q.rating > p.rating).length]));
+  }
+
+  const rankBadge = (rank) => `<span class="medal ${rank <= 3 ? 'm' + rank : 'mn'}">${rank}</span>`;
+
+  const lrow = (p, lead, extra = '') => `
+    <a class="lrow" href="#/p/${esc(p.id)}">
+      ${lead}
+      <div class="lrow-text">
+        <div class="lrow-title">${esc(p.name)}</div>
+        <div class="lrow-sub">${metaLine(p, ['category', 'area'])}</div>
+      </div>
+      <span class="lrow-score"><span class="lrow-num">${starSolid()}${fmtRating(p.rating)}</span>${extra}</span>
+      ${icon('chev', 'chev')}
+    </a>`;
+
   function categories() {
     const counts = new Map();
     state.places.forEach((p) => p.category && counts.set(p.category, (counts.get(p.category) || 0) + 1));
@@ -239,7 +258,7 @@
       : '';
 
     // List
-    const rankMap = new Map(ranked().map((p, i) => [p.id, i + 1]));
+    const ranks = rankMap();
     const sorter = state.sort === 'new' ? byNew : state.sort === 'az' ? byAZ : byTop;
     const list = state.places.filter((p) => (state.category === 'All' || p.category === state.category) && matches(p, state.query)).sort(sorter);
 
@@ -255,7 +274,7 @@
     }
 
     cards.innerHTML = list.map((p, i) => {
-      const rank = rankMap.get(p.id);
+      const rank = ranks.get(p.id);
       const showRank = state.sort === 'top';
       return `
         <a class="card" href="#/p/${esc(p.id)}" style="--i:${animate ? Math.min(i, 8) : 0};${animate ? '' : 'animation:none'}">
@@ -326,16 +345,7 @@
     const recent = [...ps].sort(byNew).slice(0, 3);
     let n = 0;
 
-    const lrow = (p, lead) => `
-      <a class="lrow" href="#/p/${esc(p.id)}">
-        ${lead}
-        <div class="lrow-text">
-          <div class="lrow-title">${esc(p.name)}</div>
-          <div class="lrow-sub">${metaLine(p, ['category', 'area'])}</div>
-        </div>
-        <span class="lrow-score">${starSolid()}${fmtRating(p.rating)}</span>
-        ${icon('chev', 'chev')}
-      </a>`;
+    const ranks = rankMap();
 
     el.innerHTML = `
       <div class="tiles">
@@ -354,8 +364,9 @@
       <div class="panel" style="--n:${n++}">
         <div class="panel-title">Hall of Fame</div>
         <div class="list-rows">
-          ${top.slice(0, 3).map((p, i) => lrow(p, `<span class="medal m${i + 1}">${i + 1}</span>`)).join('')}
+          ${top.slice(0, 3).map((p) => lrow(p, rankBadge(ranks.get(p.id)))).join('')}
         </div>
+        ${ps.length > 3 ? `<a class="see-all" href="#/ranks">See all ${ps.length} rankings${icon('chev')}</a>` : ''}
       </div>
 
       <div class="panel" style="--n:${n++}">
@@ -506,7 +517,7 @@
       el.fullWidth = el.offsetWidth;
       mapState.markers.set(p.id, m);
     });
-    fitMap(false);
+    fitMap(false, true);
     declutter();
   }
 
@@ -516,22 +527,28 @@
     if (!map) return;
     const order = state.places.filter((p) => hasCoords(p) && mapState.markers.has(p.id)).sort(byTop);
     if (mapState.selected) order.sort((a, b) => (b.id === mapState.selected) - (a.id === mapState.selected));
-    const groups = [];
+    // Best spots get full cards; spots that would collide shrink to photo bubbles;
+    // only bubbles that would sit on top of each other fold into a "+N" badge.
+    const placed = [];
+    const hits = (b) => placed.find((o) => b.l < o.box.r && b.r > o.box.l && b.t < o.box.b && b.b > o.box.t);
     order.forEach((p) => {
       const el = mapState.markers.get(p.id).getElement();
       const pt = map.project([p.lng, p.lat]);
-      const w = (el.fullWidth || 170) + 8;
-      const box = { l: pt.x - w / 2, r: pt.x + w / 2, t: pt.y - 58, b: pt.y };
-      const owner = groups.find((g) => box.l < g.box.r && box.r > g.box.l && box.t < g.box.b && box.b > g.box.t);
-      if (owner) {
-        owner.members.push(p);
-        el.classList.add('is-hidden');
-      } else {
-        groups.push({ box, el, members: [p] });
-        el.classList.remove('is-hidden');
-      }
+      const w = (el.fullWidth || 170) + 6;
+      const full = { l: pt.x - w / 2, r: pt.x + w / 2, t: pt.y - 56, b: pt.y };
+      const dot = { l: pt.x - 14, r: pt.x + 14, t: pt.y - 40, b: pt.y - 8 }; // bubbles may overlap a little
+      const selected = p.id === mapState.selected;
+      let mode = 'hidden';
+      let owner = null;
+      if (selected || !hits(full)) mode = 'full';
+      else if (!hits(dot)) mode = 'dot';
+      else owner = hits(dot);
+      el.classList.toggle('is-hidden', mode === 'hidden');
+      el.classList.toggle('is-compact', mode === 'dot');
+      if (owner) owner.members.push(p);
+      else placed.push({ box: mode === 'full' ? full : dot, el, members: [p] });
     });
-    groups.forEach((g) => {
+    placed.forEach((g) => {
       const n = g.members.length - 1;
       g.el.cluster = g.members;
       g.el.classList.toggle('has-more', n > 0);
@@ -548,11 +565,23 @@
     mapState.map.fitBounds(b, { padding: { top: 150, bottom: 190, left: 90, right: 90 }, maxZoom: 17.5, duration: 800 });
   }
 
-  function fitMap(animate = true) {
+  // The opening view frames the densest cluster of spots (usually campus and downtown)
+  // so it isn't zoomed out too far to tell spots apart. The locate button shows everything.
+  function corePlaces(pts) {
+    const km = (a, b) => Math.hypot((a.lat - b.lat) * 111, (a.lng - b.lng) * 111 * Math.cos((a.lat * Math.PI) / 180));
+    const near = (c) => pts.filter((p) => km(c, p) <= 1.6);
+    const best = pts.map(near).sort((a, b) => b.length - a.length)[0];
+    return best.length >= 3 ? best : pts;
+  }
+
+  function fitMap(animate = true, core = false) {
     const gl = window.maplibregl;
-    const pts = state.places.filter(hasCoords);
+    let pts = state.places.filter(hasCoords);
+    if (core && pts.length > 2) pts = corePlaces(pts);
     if (!gl || !mapState.map || !pts.length) return;
-    const opts = { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 110, right: 110 }, maxZoom: 15 };
+    const opts = core
+      ? { animate, duration: animate ? 900 : 0, padding: { top: 120, bottom: 160, left: 75, right: 75 }, maxZoom: 16 }
+      : { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 110, right: 110 }, maxZoom: 15 };
     if (pts.length === 1) { mapState.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: opts.duration }); return; }
     const b = new gl.LngLatBounds();
     pts.forEach((p) => b.extend([p.lng, p.lat]));
@@ -632,12 +661,13 @@
     closeTimer: null,
   };
 
-  function openSheet(kind, html, { compact = false } = {}) {
+  function openSheet(kind, html, { compact = false, plain = false } = {}) {
     clearTimeout(sheet.closeTimer);
     const el = sheet.el;
     destroyMini();
     sheet.kind = kind;
     el.classList.toggle('compact', compact);
+    el.classList.toggle('plain', plain);
     el.classList.remove('is-closing');
     sheet.scroll.innerHTML = html;
     sheet.scroll.scrollTop = 0;
@@ -854,6 +884,22 @@
     }
   }
 
+  /* ---------- Rankings sheet ---------- */
+
+  function openRanks() {
+    const list = ranked();
+    const ranks = rankMap();
+    openSheet('ranks', `
+      <div class="ranks">
+        <p class="eyebrow">Hall of Fame</p>
+        <h1 class="ranks-title">Every spot, ranked</h1>
+        <p class="ranks-sub">${list.length} spots, best to worst</p>
+        <div class="ranks-list">
+          ${list.map((p, i) => `<div class="ranks-item" style="--n:${Math.min(i, 14)}">${lrow(p, `${rankBadge(ranks.get(p.id))}${photo(p)}`, `<small class="${isMustGo(p) ? 'hot' : ''}">${verdictOf(p)}</small>`)}</div>`).join('')}
+        </div>
+      </div>`, { plain: true });
+  }
+
   /* ---------- Add sheet ---------- */
 
   const TEMPLATE = 'Add to the Grub Guide: [place name], [rating]/10. [what we thought]';
@@ -992,6 +1038,7 @@
     if (h.startsWith('p/')) return { kind: 'place', id: h.slice(2) };
     if (h === 'add') return { kind: 'add' };
     if (h === 'pick') return { kind: 'pick' };
+    if (h === 'ranks') return { kind: 'ranks' };
     return { kind: null };
   }
 
@@ -1001,7 +1048,7 @@
     if (!state.loaded) return;
     const same = sheet.kind === r.kind && (r.kind !== 'place' || sheet.id === r.id);
     if (same) return;
-    const open = () => (r.kind === 'place' ? openPlace(r.id) : r.kind === 'add' ? openAdd() : openPick());
+    const open = () => ({ place: () => openPlace(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
     if (sheet.kind) {
       hideSheet();
       sheet.closeTimer && clearTimeout(sheet.closeTimer);
