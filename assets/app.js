@@ -223,7 +223,7 @@
         <div class="hero-scrim"></div>
         <div class="hero-top">
           <span class="hero-eyebrow">${latest.visited ? `Latest &middot; ${esc(shortDate(latest.visited))}` : 'Latest'}</span>
-          <span class="pill">${starSolid()}${fmtRating(latest.rating)}</span>
+          <span class="pill">${starSolid()}${fmtRating(latest.rating)}<small>/10</small></span>
         </div>
         <div class="hero-text">
           <p class="hero-meta">${metaLine(latest)}</p>
@@ -263,7 +263,7 @@
             ${photo(p, 0, i < 2 && filtering)}
             <div class="card-badges">
               ${showRank ? `<span class="rank ${rank <= 3 ? 'r' + rank : ''}">${rank}</span>` : '<span></span>'}
-              <span class="pill">${starSolid()}${fmtRating(p.rating)}</span>
+              <span class="pill">${starSolid()}${fmtRating(p.rating)}<small>/10</small></span>
             </div>
           </div>
           <div class="card-body">
