@@ -1954,3 +1954,21 @@ textarea.field { min-height: 120px; }
 .rate-done .rate-title { margin-bottom: 10px; }
 .rate-done-text { font-size: 17px; line-height: 1.45; color: var(--label-2); max-width: 340px; margin: 0 auto 26px; text-wrap: pretty; }
 .rate-done .btn + .btn { margin-top: 10px; }
+
+.add-chat { margin-top: 10px; }
+.btn-plain { color: var(--label-2); font-weight: 500; }
+.rate-preview {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--surface-2);
+  text-align: left;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.rate-done .btn + .btn { margin-top: 10px; }

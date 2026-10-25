@@ -72,9 +72,20 @@ Adding to the list: research each place exactly like a rated spot (MapQuest page
 
 Editing or removing a spot works the same way: change `data/places.json` (and photos), validate, commit, push both.
 
-## Rating from the app (no chat needed)
+## Rating from the app
 
-Every To Try spot has a **Rate it** button, and the + sheet has **Rate a new spot**. The form (rating slider, comments one per line, optional dish, Must-go switch) opens a prefilled GitHub issue containing a `<!-- grub-guide-review -->` marker and a JSON block `{ id, name, rating, mustGo, order, comments }` (`id` is the wishlist id or `"new"`). When the repo owner submits it, `.github/workflows/rate-from-app.yml` runs Claude Code (`anthropics/claude-code-action@v1`) with this file as its playbook, pushes to `main`, requests a Pages build and closes the issue. It needs an `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` repo secret and the Claude GitHub App installed. The app remembers sent ratings in localStorage, shows "Rating sent · updating" and re-checks the data every 45 seconds until the place lands in `places.json`.
+Every To Try spot has a **Rate it** button, and the + sheet has **Rate a new spot**. The form (rating slider, comments one per line, optional dish, Must-go switch) copies a message like this for the user to paste into the Claude chat:
+
+```
+Add to the Grub Guide: Bow & Arrow
+Rating: 8.4/10 (Must-go)
+Order this: Brisket tacos
+- Brisket was amazing
+- A little pricey
+(It's on our To Try list as "bow-and-arrow".)
+```
+
+Treat it like any other rating: move the spot from the To Try list (or research it if it says "New place"), set `verdict: "Must-go"` only when "(Must-go)" is there, and `mustTry` only from "Order this". The app remembers sent ratings in localStorage, shows "Rating sent · updating" and re-checks the data every 45 seconds until the place appears in `places.json`. (A GitHub Action version was built and removed because it needs a paid API key or subscription token; the user chose copy and paste.)
 
 ## Notes
 

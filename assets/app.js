@@ -4,7 +4,7 @@
 
   const DATA_URL = 'data/places.json';
   const WISH_URL = 'data/wishlist.json';
-  const REPO = 'Bhg0012/auburn-grub-guide';
+  const CLAUDE_URL = 'https://claude.ai/code/session_015BjXjcynLabXApgbGQSzhx';
   const PENDING_KEY = 'grubguide.pending';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
   const MAPLIBRE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js';
@@ -1008,27 +1008,18 @@
 
   /* ---------- Add sheet ---------- */
 
-  const TEMPLATE = 'Add to the Grub Guide: [place name], [rating]/10. [what we thought]';
-
   function openAdd() {
     openSheet('add', `
       <div class="compact-body">
         <div class="compact-icon">${icon('sparkle')}</div>
         <h2>Add a spot</h2>
-        <p>Rate it right here and the guide updates itself in a few minutes.</p>
+        <p>Fill out a quick review, then paste it to Claude. Claude finds the photos, address and details, and the guide updates in a few minutes.</p>
         <a class="btn btn-primary btn-block add-rate" href="#/rate/new">${icon('star')}Rate a new spot</a>
-        <p class="add-or">Or tell Claude in the chat</p>
-        <div class="steps">
-          <div class="step"><span class="step-n">1</span><p>Open the Claude chat for this guide.<br><span>The same one that built it.</span></p></div>
-          <div class="step"><span class="step-n">2</span><p>Send the place, your rating out of 10, and a note or two.</p></div>
-          <div class="step"><span class="step-n">3</span><p>Claude finds photos, the address and details, then publishes.<br><span>Refresh in a minute or two.</span></p></div>
-        </div>
-        <div class="template">Add to the Grub Guide: <em>Momma Goldberg’s</em>, <em>8.5/10</em>. <em>The Momma’s sub is unreal. Go for the fries too.</em></div>
-        <button class="btn btn-tinted btn-block" data-copy>${icon('copy')}Copy a template</button>
+        <a class="btn btn-tinted btn-block add-chat" href="${CLAUDE_URL}" target="_blank" rel="noopener">${icon('bubble')}Open Claude chat</a>
       </div>`, { compact: true });
   }
 
-  /* ---------- Rate it (sends a GitHub issue that Claude Code turns into an update) ---------- */
+  /* ---------- Rate it (copies a review to paste into the Claude chat) ---------- */
 
   function readPending() {
     try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (_) { return []; }
@@ -1072,7 +1063,7 @@
         <input class="field" id="rateOrder" placeholder="A dish worth getting" autocomplete="off">
         <label class="switch-row"><span><b>Must-go</b><small>Highlights it no matter the score</small></span><input type="checkbox" id="rateMust" role="switch"><i></i></label>
         <button class="btn btn-primary btn-block" id="rateSubmit">Submit</button>
-        <p class="try-foot">Opens GitHub with your review filled in. Tap <b>Submit new issue</b> there and the guide updates itself in a few minutes.</p>
+        <p class="try-foot">Copies your review so you can paste it in the Claude chat. The guide updates a few minutes after you send it.</p>
       </div>`, { plain: true });
     sheet.id = id || 'new';
     const range = $('#rateRange');
@@ -1107,34 +1098,46 @@
     if (!name) { toast('Add the restaurant name', 'x'); $('#rateName')?.focus(); return; }
     if (!comments.length) { toast('Add a comment or two', 'x'); $('#rateComments').focus(); return; }
 
-    const data = { id: w ? w.id : 'new', name, rating, mustGo, order, comments };
-    const body = [
-      '<!-- grub-guide-review -->',
-      `**${name}**: ${rating.toFixed(1)}/10${mustGo ? ' (Must-go)' : ''}`,
-      '',
+    const text = [
+      `Add to the Grub Guide: ${name}`,
+      `Rating: ${rating.toFixed(1)}/10${mustGo ? ' (Must-go)' : ''}`,
+      ...(order ? [`Order this: ${order}`] : []),
       ...comments.map((c) => `- ${c}`),
-      ...(order ? ['', `Order this: ${order}`] : []),
-      '',
-      '```json',
-      JSON.stringify(data, null, 2),
-      '```',
-      '',
-      '_Sent from the Auburn Grub Guide app. Claude Code updates the guide when this is submitted._',
+      w ? `(It's on our To Try list as "${w.id}".)` : '(New place, not on our To Try list.)',
     ].join('\n');
-    const url = `https://github.com/${REPO}/issues/new?title=${encodeURIComponent(`Rate: ${name} (${rating.toFixed(1)}/10)`)}&body=${encodeURIComponent(body)}`;
-    window.open(url, '_blank', 'noopener');
 
-    writePending([...readPending().filter((x) => x.id !== data.id || data.id === 'new'), { id: data.id, name, rating, ts: Date.now() }]);
+    let copied = false;
+    try {
+      navigator.clipboard.writeText(text).then(() => { copied = true; }, () => {});
+      copied = true;
+    } catch (_) { /* clipboard unavailable */ }
+
+    writePending([...readPending().filter((x) => x.id !== (w ? w.id : name)), { id: w ? w.id : name, name, rating, ts: Date.now() }]);
     haptic(14);
     sheet.scroll.innerHTML = `
       <div class="rate rate-done">
-        <div class="compact-icon">${icon('check')}</div>
-        <h1 class="rate-title">Almost done</h1>
-        <p class="rate-done-text">In GitHub, tap <b>Submit new issue</b>. Claude adds ${esc(name)} to the guide and it shows up here in about 3 minutes.</p>
-        <a class="btn btn-tinted btn-block" href="${esc(url)}" target="_blank" rel="noopener">Open GitHub again</a>
-        <button class="btn btn-primary btn-block" id="rateDone">Done</button>
+        <div class="compact-icon">${icon(copied ? 'check' : 'copy')}</div>
+        <h1 class="rate-title">${copied ? 'Copied' : 'Copy this'}</h1>
+        <p class="rate-done-text">Open the Claude chat, paste, and send. ${esc(name)} shows up here a few minutes later.</p>
+        <pre class="rate-preview" id="ratePreview">${esc(text)}</pre>
+        <a class="btn btn-primary btn-block" href="${CLAUDE_URL}" target="_blank" rel="noopener">${icon('bubble')}Open Claude chat</a>
+        <button class="btn btn-tinted btn-block" id="rateCopy">${icon('copy')}Copy again</button>
+        <button class="btn btn-plain btn-block" id="rateDone">Done</button>
       </div>`;
+    sheet.lastReview = text;
     renderTry();
+  }
+
+  async function copyReview() {
+    try {
+      await navigator.clipboard.writeText(sheet.lastReview || '');
+      haptic(10);
+      toast('Copied');
+    } catch (_) {
+      const pre = $('#ratePreview');
+      if (pre) { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+      toast('Select the text and copy it', 'copy');
+    }
   }
 
   /* ---------- Pick sheet (slot machine) ---------- */
@@ -1291,16 +1294,6 @@
     } catch (_) { /* user cancelled */ }
   }
 
-  async function copyTemplate() {
-    try {
-      await navigator.clipboard.writeText(TEMPLATE);
-      haptic(12);
-      toast('Template copied');
-    } catch (_) {
-      toast('Couldn’t copy', 'x');
-    }
-  }
-
   /* ---------- Router ---------- */
 
   function parseRoute() {
@@ -1395,12 +1388,12 @@
       }
       const share = e.target.closest('[data-share]');
       if (share) { sharePlace(share.dataset.share); return; }
-      if (e.target.closest('[data-copy]')) { copyTemplate(); return; }
       if (e.target.closest('#spinBtn')) { doSpin(); return; }
       const step = e.target.closest('.rate-step');
       if (step) { stepRate(parseFloat(step.dataset.step)); return; }
       if (e.target.closest('#rateSubmit')) { submitRate(); return; }
       if (e.target.closest('#rateDone')) { closeSheet(); return; }
+      if (e.target.closest('#rateCopy')) { copyReview(); return; }
       if (e.target.closest('#spinAgain')) { $('#spinBtn').hidden = false; $('#spinBtn').disabled = false; doSpin(); return; }
       const chip = e.target.closest('.chip');
       if (chip) {
