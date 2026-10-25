@@ -426,29 +426,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "panda-express",
-      "name": "Panda Express",
-      "category": "Chinese",
-      "tier": "quick",
-      "area": "Campus",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Panda Express on Auburn's campus, with orange chicken, chow mein, fried rice and the rest of the usual lineup. It keeps campus hours, so it's closed on weekends.",
-      "address": "1310 Wilmore Dr, Auburn, AL 36849",
-      "lat": 32.605012,
-      "lng": -85.485264,
-      "phone": "(334) 844-1818",
-      "website": "https://www.pandaexpress.com/",
-      "hours": "Mon-Thu 10am-9pm, Fri 10am-6pm, Sat-Sun closed",
-      "photos": [
-        "images/places/panda-express/1.jpg",
-        "images/places/panda-express/2.jpg",
-        "images/places/panda-express/3.jpg",
-        "images/places/panda-express/4.jpg",
-        "images/places/panda-express/5.jpg"
-      ],
-      "photoCredit": "Panda Express"
-    },
-    {
       "id": "waffle-house",
       "name": "Waffle House",
       "category": "Breakfast",
