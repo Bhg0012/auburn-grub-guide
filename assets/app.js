@@ -4,6 +4,8 @@
 
   const DATA_URL = 'data/places.json';
   const WISH_URL = 'data/wishlist.json';
+  const REPO = 'Bhg0012/auburn-grub-guide';
+  const PENDING_KEY = 'grubguide.pending';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
   const MAPLIBRE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js';
   const MAPLIBRE_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css';
@@ -27,6 +29,8 @@
     x: '<path d="M6 6l12 12M18 6 6 18"/>',
     xfill: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.7 12.3a1 1 0 0 1-1.4 1.4L12 13.4l-2.3 2.3a1 1 0 0 1-1.4-1.4l2.3-2.3-2.3-2.3a1 1 0 0 1 1.4-1.4l2.3 2.3 2.3-2.3a1 1 0 0 1 1.4 1.4L13.4 12l2.3 2.3Z"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
+    star: '<path d="M12 3.2l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.6l-5.2 2.8 1-5.9-4.3-4.1 5.9-.8L12 3.2Z"/>',
     dice: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="8.6" cy="8.6" r="1.25" fill="currentColor" stroke="none"/><circle cx="15.4" cy="8.6" r="1.25" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.25" fill="currentColor" stroke="none"/><circle cx="8.6" cy="15.4" r="1.25" fill="currentColor" stroke="none"/><circle cx="15.4" cy="15.4" r="1.25" fill="currentColor" stroke="none"/>',
     fork: '<path d="M6 3v5.5a3 3 0 0 0 6 0V3M9 3v18"/><path d="M18 21V3c-2.4 1.3-3.4 4-3.4 7.2V14H18"/>',
     map: '<path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Z"/><path d="M9 4v14M15 6v14"/>',
@@ -746,6 +750,7 @@
 
     el.addEventListener('touchstart', (e) => {
       if (!el.classList.contains('is-open') || e.touches.length > 1) return;
+      if (e.target.closest('input, textarea')) { d = null; return; }
       const t = e.touches[0];
       d = { x0: t.clientX, y0: t.clientY, dy: 0, decided: false, active: false, samples: [[t.clientY, e.timeStamp]] };
     }, { passive: true });
@@ -848,11 +853,12 @@
 
         ${wish ? `
         <div class="score tryit">
-          <div class="tryit-icon">${icon('bookmark')}</div>
+          <div class="tryit-icon">${icon(pendingFor(p.id) ? 'check' : 'bookmark')}</div>
           <div class="score-side">
-            <span class="tryit-title">Not tried yet</span>
-            <span class="score-verdict">On our To Try list</span>
+            <span class="tryit-title">${pendingFor(p.id) ? 'Rating sent' : 'Not tried yet'}</span>
+            <span class="score-verdict">${pendingFor(p.id) ? 'Updating the guide' : 'On our To Try list'}</span>
           </div>
+          ${pendingFor(p.id) ? '' : `<a class="btn btn-primary tryit-btn" href="#/rate/${esc(p.id)}">${icon('star')}Rate it</a>`}
         </div>` : `
         <div class="score">
           <div class="score-num">${fmtRating(p.rating)}<small>/10</small></div>
@@ -892,7 +898,7 @@
           ${rows ? `<div class="group" ${hasCoords(p) ? '' : ''}>${rows}</div>` : ''}
         </section>` : ''}
 
-        ${wish ? '<p class="try-foot" style="margin-top:22px">Once you go, send Claude your rating and a note, and it moves over to the Guide.</p>' : ''}
+        ${wish ? '<p class="try-foot" style="margin-top:22px">Been here? Tap Rate it and it moves over to the Guide.</p>' : ''}
         ${p.photoCredit ? `<p class="credit">Photos: ${esc(p.photoCredit)}</p>` : ''}
       </div>`;
   }
@@ -966,12 +972,12 @@
             ${w.photos.length ? photo(w) : mono(w)}
             <div class="lrow-text">
               <div class="lrow-title">${esc(w.name)}</div>
-              <div class="lrow-sub">${tierText(w)} &middot; ${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}</div>
+              <div class="lrow-sub">${pendingFor(w.id) ? `<span class="pending-text">Rating sent &middot; updating</span>` : `${tierText(w)} &middot; ${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}`}</div>
             </div>
             ${icon('chev', 'chev')}
           </a>`).join('')}
       </div>
-      <p class="try-foot">Tried one? Send Claude your rating and a note, and it moves over to the Guide.</p>`;
+      <p class="try-foot">Tried one? Open it and tap Rate it. It moves over to the Guide a few minutes later.</p>`;
   }
 
   function wishDirections(w) {
@@ -1009,7 +1015,9 @@
       <div class="compact-body">
         <div class="compact-icon">${icon('sparkle')}</div>
         <h2>Add a spot</h2>
-        <p>Just tell Claude. It does the legwork and the guide updates itself.</p>
+        <p>Rate it right here and the guide updates itself in a few minutes.</p>
+        <a class="btn btn-primary btn-block add-rate" href="#/rate/new">${icon('star')}Rate a new spot</a>
+        <p class="add-or">Or tell Claude in the chat</p>
         <div class="steps">
           <div class="step"><span class="step-n">1</span><p>Open the Claude chat for this guide.<br><span>The same one that built it.</span></p></div>
           <div class="step"><span class="step-n">2</span><p>Send the place, your rating out of 10, and a note or two.</p></div>
@@ -1018,6 +1026,115 @@
         <div class="template">Add to the Grub Guide: <em>Momma Goldberg’s</em>, <em>8.5/10</em>. <em>The Momma’s sub is unreal. Go for the fries too.</em></div>
         <button class="btn btn-tinted btn-block" data-copy>${icon('copy')}Copy a template</button>
       </div>`, { compact: true });
+  }
+
+  /* ---------- Rate it (sends a GitHub issue that Claude Code turns into an update) ---------- */
+
+  function readPending() {
+    try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (_) { return []; }
+  }
+  function writePending(list) {
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify(list)); } catch (_) { /* private mode */ }
+  }
+  const pendingFor = (id) => readPending().find((x) => x.id === id);
+  const normName = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // Drop pending reviews that have landed (or are over 2 hours old) and say so.
+  function settlePending() {
+    const rated = new Set(state.places.map((p) => normName(p.name)));
+    const keep = [];
+    readPending().forEach((x) => {
+      if (rated.has(normName(x.name))) toast(`${x.name} is in the guide`, 'check');
+      else if (Date.now() - x.ts < 2 * 3600e3) keep.push(x);
+    });
+    writePending(keep);
+  }
+
+  function openRate(id) {
+    const w = id && id !== 'new' ? state.wishById.get(id) : null;
+    openSheet('rate', `
+      <div class="rate">
+        ${w ? `<div class="rate-head">${w.photos.length ? photo(w, 0, true) : mono(w)}<div><p class="eyebrow">Rate it</p><h1 class="rate-title">${esc(w.name)}</h1></div></div>`
+            : `<p class="eyebrow">Rate it</p><h1 class="rate-title">New spot</h1>
+               <input class="field" id="rateName" placeholder="Restaurant name" autocomplete="off" autocapitalize="words" enterkeyhint="next">`}
+        <div class="rate-card">
+          <div class="rate-score"><span class="rate-num" id="rateNum">7.5</span><small>/10</small></div>
+          <div class="rate-sub"><span id="rateStars">${stars(7.5)}</span><span class="rate-verdict" id="rateVerdict">${verdict(7.5)}</span></div>
+          <div class="rate-slider">
+            <button type="button" class="rate-step" data-step="-0.1" aria-label="Lower">${icon('minus')}</button>
+            <input type="range" id="rateRange" min="0" max="10" step="0.1" value="7.5" aria-label="Rating out of 10">
+            <button type="button" class="rate-step" data-step="0.1" aria-label="Higher">${icon('plus')}</button>
+          </div>
+        </div>
+        <label class="field-label" for="rateComments">What did you think?</label>
+        <textarea class="field" id="rateComments" rows="5" placeholder="Great food, a little pricey.&#10;Service was quick.&#10;One thought per line."></textarea>
+        <label class="field-label" for="rateOrder">Order this <span>(optional)</span></label>
+        <input class="field" id="rateOrder" placeholder="A dish worth getting" autocomplete="off">
+        <label class="switch-row"><span><b>Must-go</b><small>Highlights it no matter the score</small></span><input type="checkbox" id="rateMust" role="switch"><i></i></label>
+        <button class="btn btn-primary btn-block" id="rateSubmit">Submit</button>
+        <p class="try-foot">Opens GitHub with your review filled in. Tap <b>Submit new issue</b> there and the guide updates itself in a few minutes.</p>
+      </div>`, { plain: true });
+    sheet.id = id || 'new';
+    const range = $('#rateRange');
+    const sync = () => {
+      const r = Math.round(parseFloat(range.value) * 10) / 10;
+      $('#rateNum').textContent = r.toFixed(1);
+      $('#rateStars').innerHTML = stars(r);
+      $('#rateVerdict').textContent = $('#rateMust').checked ? 'Must-go' : verdict(r);
+      range.style.setProperty('--p', `${r * 10}%`);
+    };
+    range.addEventListener('input', () => { sync(); if (Math.round(range.value * 10) % 5 === 0) haptic(3); });
+    $('#rateMust').addEventListener('change', () => { haptic(8); sync(); });
+    sync();
+  }
+
+  function stepRate(delta) {
+    const range = $('#rateRange');
+    if (!range) return;
+    range.value = clamp(Math.round((parseFloat(range.value) + delta) * 10) / 10, 0, 10);
+    range.dispatchEvent(new Event('input'));
+    haptic(5);
+  }
+
+  function submitRate() {
+    const id = sheet.id;
+    const w = id !== 'new' ? state.wishById.get(id) : null;
+    const name = w ? w.name : ($('#rateName')?.value || '').trim();
+    const rating = Math.round(parseFloat($('#rateRange').value) * 10) / 10;
+    const comments = $('#rateComments').value.split(/\n+/).map((c) => c.trim()).filter(Boolean);
+    const order = $('#rateOrder').value.trim();
+    const mustGo = $('#rateMust').checked;
+    if (!name) { toast('Add the restaurant name', 'x'); $('#rateName')?.focus(); return; }
+    if (!comments.length) { toast('Add a comment or two', 'x'); $('#rateComments').focus(); return; }
+
+    const data = { id: w ? w.id : 'new', name, rating, mustGo, order, comments };
+    const body = [
+      '<!-- grub-guide-review -->',
+      `**${name}**: ${rating.toFixed(1)}/10${mustGo ? ' (Must-go)' : ''}`,
+      '',
+      ...comments.map((c) => `- ${c}`),
+      ...(order ? ['', `Order this: ${order}`] : []),
+      '',
+      '```json',
+      JSON.stringify(data, null, 2),
+      '```',
+      '',
+      '_Sent from the Auburn Grub Guide app. Claude Code updates the guide when this is submitted._',
+    ].join('\n');
+    const url = `https://github.com/${REPO}/issues/new?title=${encodeURIComponent(`Rate: ${name} (${rating.toFixed(1)}/10)`)}&body=${encodeURIComponent(body)}`;
+    window.open(url, '_blank', 'noopener');
+
+    writePending([...readPending().filter((x) => x.id !== data.id || data.id === 'new'), { id: data.id, name, rating, ts: Date.now() }]);
+    haptic(14);
+    sheet.scroll.innerHTML = `
+      <div class="rate rate-done">
+        <div class="compact-icon">${icon('check')}</div>
+        <h1 class="rate-title">Almost done</h1>
+        <p class="rate-done-text">In GitHub, tap <b>Submit new issue</b>. Claude adds ${esc(name)} to the guide and it shows up here in about 3 minutes.</p>
+        <a class="btn btn-tinted btn-block" href="${esc(url)}" target="_blank" rel="noopener">Open GitHub again</a>
+        <button class="btn btn-primary btn-block" id="rateDone">Done</button>
+      </div>`;
+    renderTry();
   }
 
   /* ---------- Pick sheet (slot machine) ---------- */
@@ -1190,6 +1307,7 @@
     const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     if (h.startsWith('p/')) return { kind: 'place', id: h.slice(2) };
     if (h.startsWith('w/')) return { kind: 'wish', id: h.slice(2) };
+    if (h.startsWith('rate/')) return { kind: 'rate', id: h.slice(5) };
     if (h === 'add') return { kind: 'add' };
     if (h === 'pick') return { kind: 'pick' };
     if (h === 'ranks') return { kind: 'ranks' };
@@ -1200,9 +1318,9 @@
     const r = parseRoute();
     if (!r.kind) { hideSheet(); return; }
     if (!state.loaded) return;
-    const same = sheet.kind === r.kind && ((r.kind !== 'place' && r.kind !== 'wish') || sheet.id === r.id);
+    const same = sheet.kind === r.kind && (!['place', 'wish', 'rate'].includes(r.kind) || sheet.id === r.id);
     if (same) return;
-    const open = () => ({ place: () => openPlace(r.id), wish: () => openWish(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
+    const open = () => ({ place: () => openPlace(r.id), wish: () => openWish(r.id), rate: () => openRate(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
     if (sheet.kind) {
       hideSheet();
       sheet.closeTimer && clearTimeout(sheet.closeTimer);
@@ -1279,6 +1397,10 @@
       if (share) { sharePlace(share.dataset.share); return; }
       if (e.target.closest('[data-copy]')) { copyTemplate(); return; }
       if (e.target.closest('#spinBtn')) { doSpin(); return; }
+      const step = e.target.closest('.rate-step');
+      if (step) { stepRate(parseFloat(step.dataset.step)); return; }
+      if (e.target.closest('#rateSubmit')) { submitRate(); return; }
+      if (e.target.closest('#rateDone')) { closeSheet(); return; }
       if (e.target.closest('#spinAgain')) { $('#spinBtn').hidden = false; $('#spinBtn').disabled = false; doSpin(); return; }
       const chip = e.target.closest('.chip');
       if (chip) {
@@ -1331,23 +1453,34 @@
 
   /* ---------- Boot ---------- */
 
-  async function load() {
-    skeleton();
+  async function load({ quiet = false } = {}) {
+    if (!quiet) skeleton();
     const get = (url) => fetch(url, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
     const [places, wish] = await Promise.all([
       get(DATA_URL).catch((err) => { console.error('Could not load places', err); return null; }),
       get(WISH_URL).catch((err) => { console.error('Could not load wishlist', err); return null; }),
     ]);
+    if (quiet && !places) return;
+    const before = state.places.length;
     state.places = normalize(places);
     state.wish = normalizeWish(wish);
     state.byId = new Map(state.places.map((p) => [p.id, p]));
     state.wishById = new Map(state.wish.map((w) => [w.id, w]));
     state.loaded = true;
-    renderGuide();
+    settlePending();
+    if (quiet && state.places.length === before) { renderTry(); return; }
+    renderGuide(!quiet);
     renderTry();
     renderStats();
     if (mapState.map) drawPins();
-    applyRoute();
+    if (!quiet) applyRoute();
+  }
+
+  // While a rating is on its way, check for the update so it appears on its own.
+  function watchPending() {
+    const check = () => { if (!document.hidden && readPending().length) load({ quiet: true }); };
+    setInterval(check, 45000);
+    document.addEventListener('visibilitychange', check);
   }
 
   function boot() {
@@ -1356,6 +1489,7 @@
     hydrateIcons();
     bind();
     load();
+    watchPending();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

@@ -1,0 +1,89 @@
+name: Rate from app
+
+# The app's "Rate it" form opens a prefilled GitHub issue. When the repo owner
+# submits it, Claude Code adds the rating to the guide, pushes to main
+# (GitHub Pages redeploys), then this workflow closes the issue.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: rate-from-app
+  cancel-in-progress: false
+
+jobs:
+  rate:
+    if: >-
+      github.event.issue.user.login == github.repository_owner &&
+      contains(github.event.issue.body, 'grub-guide-review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Tools for photos and checks
+        run: pip install --quiet pillow
+
+      - name: Let the issue know it's being worked on
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Got it. Updating the guide now, this usually takes a few minutes."
+
+      - name: Claude updates the guide
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --max-turns 80
+            --allowedTools Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch
+          prompt: |
+            You maintain the Auburn Grub Guide in this repository. Read CLAUDE.md first and follow it exactly.
+
+            Bruce just rated a restaurant from the app. The review is in GitHub issue #${{ github.event.issue.number }}:
+
+            Title: ${{ github.event.issue.title }}
+
+            ${{ github.event.issue.body }}
+
+            Do this:
+            1. Parse the JSON block in the review. "id" is the To Try list id if the place is on data/wishlist.json, or "new" for a place that isn't.
+            2. If it's on the To Try list, move it into data/places.json as CLAUDE.md describes (keep its photos and details, add rating, comments, price, tags, tier, a fresh "added" timestamp, verdict "Must-go" only if mustGo is true, mustTry only from "order"), and delete it from data/wishlist.json.
+               If it's new, research and add it exactly like CLAUDE.md's "Adding a spot" steps, including 3-5 photos. Use a temporary folder outside the repo for downloads.
+               If the place is already in data/places.json, update its rating and add the new comments instead.
+            3. Keep Bruce's comments in his own words, lightly cleaned up, one thought per bubble. Never use em dashes.
+            4. Run `node scripts/validate.mjs` and fix anything it reports.
+            5. Commit on main with message "Add <Place> (<rating>/10)", then `git pull --rebase origin main` and `git push origin HEAD:main`.
+            Don't open a pull request and don't create branches.
+
+      - name: Rebuild the site
+        if: success()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST repos/${{ github.repository }}/pages/builds
+
+      - name: Close the issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ github.event.issue.number }} --repo ${{ github.repository }} \
+            --comment "Done. It's in the guide now: https://bhg0012.github.io/auburn-grub-guide/ (refresh in a minute if you don't see it yet)."
+
+      - name: Report a failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} \
+            --body "Something went wrong updating the guide. Check the run log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
