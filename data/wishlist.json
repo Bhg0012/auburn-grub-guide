@@ -426,29 +426,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "waffle-house",
-      "name": "Waffle House",
-      "category": "Breakfast",
-      "tier": "quick",
-      "area": "Bent Creek Rd",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "The 24-hour Southern classic. This one is on Bent Creek Road by I-85, and there are others on W Glenn Ave and Opelika Rd.",
-      "address": "2346 Bent Creek Rd, Auburn, AL 36830",
-      "lat": 32.607527,
-      "lng": -85.430976,
-      "phone": "(334) 887-2087",
-      "website": "https://www.wafflehouse.com/",
-      "hours": "Open 24 hours",
-      "photos": [
-        "images/places/waffle-house/1.jpg",
-        "images/places/waffle-house/2.jpg",
-        "images/places/waffle-house/3.jpg",
-        "images/places/waffle-house/4.jpg",
-        "images/places/waffle-house/5.jpg"
-      ],
-      "photoCredit": "Yelp reviewers"
-    },
-    {
       "id": "auburn-plaza",
       "name": "Auburn Plaza Bar & Lounge",
       "category": "Gastropub",

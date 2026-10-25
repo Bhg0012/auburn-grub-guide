@@ -749,6 +749,45 @@
         "images/places/panda-express/5.jpg"
       ],
       "photoCredit": "Panda Express"
+    },
+    {
+      "id": "waffle-house",
+      "name": "Waffle House",
+      "category": "Breakfast",
+      "price": "$",
+      "tier": "quick",
+      "rating": 7.3,
+      "comments": [
+        "Price is average.",
+        "Decent quality.",
+        "Open late.",
+        "Good for people watching.",
+        "Inside seating hours are weird during the weekend.",
+        "Service is hit or miss."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Open late",
+        "People watching",
+        "Several locations"
+      ],
+      "added": "2026-10-25T17:00:00",
+      "blurb": "The 24-hour Southern classic. This one is on Bent Creek Road by I-85, and there are others on W Glenn Ave and Opelika Rd.",
+      "address": "2346 Bent Creek Rd, Auburn, AL 36830",
+      "area": "Bent Creek Rd",
+      "lat": 32.607527,
+      "lng": -85.430976,
+      "phone": "(334) 887-2087",
+      "website": "https://www.wafflehouse.com/",
+      "hours": "Open 24 hours",
+      "photos": [
+        "images/places/waffle-house/1.jpg",
+        "images/places/waffle-house/2.jpg",
+        "images/places/waffle-house/3.jpg",
+        "images/places/waffle-house/4.jpg",
+        "images/places/waffle-house/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
     }
   ]
 }
