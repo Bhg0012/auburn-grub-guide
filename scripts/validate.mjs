@@ -62,6 +62,11 @@ for (const [i, w] of wish.entries()) {
   wishIds.add(w.id);
   if (!['quick', 'sitdown'].includes(w.tier)) errors.push(`${at}: "tier" must be "quick" or "sitdown"`);
   if (ids.has(w.id) || ratedNames.has(norm(w.name))) errors.push(`${at}: already rated in places.json, remove it from the wishlist`);
+  for (const src of w.photos || []) {
+    if (!existsSync(join(root, src))) errors.push(`${at}: photo not found: ${src}`);
+  }
+  if (!w.photos || !w.photos.length) warnings.push(`${at}: no photos`);
+  if (w.website && !/^https?:\/\//.test(w.website)) errors.push(`${at}: "website" must start with http(s)://`);
 }
 for (const [i, p] of places.entries()) {
   if (p.tier && !['quick', 'sitdown'].includes(p.tier)) errors.push(`places[${i}] (${p.name}): "tier" must be "quick" or "sitdown"`);

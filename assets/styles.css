@@ -1790,3 +1790,19 @@ a.row .row-value { color: var(--accent); }
 .pick-filters + .slot { margin-top: 8px; }
 .pick-count { margin: -8px 0 14px; font-size: 13px; color: var(--label-2); }
 .pick-new { display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; text-transform: uppercase; }
+
+.score.tryit { gap: 14px; }
+.tryit-icon {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(150deg, #F28C45, var(--accent) 55%, #B9440A);
+  box-shadow: 0 8px 18px rgba(221, 85, 12, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.tryit-icon .ic { width: 26px; height: 26px; stroke-width: 2; }
+.tryit-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.pin-b .ic { width: 12px; height: 12px; stroke-width: 2.4; }

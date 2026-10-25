@@ -192,6 +192,11 @@
     return ((raw && raw.spots) || []).filter((w) => w && w.name).map((w) => ({
       ...w,
       id: w.id || w.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      wish: true,
+      photos: Array.isArray(w.photos) ? w.photos : [],
+      comments: [],
+      mustTry: [],
+      tags: Array.isArray(w.tags) ? w.tags : [],
     }));
   }
 
@@ -477,7 +482,7 @@
     const el = document.createElement('div');
     el.className = 'pin';
     el.innerHTML = compact
-      ? `<div class="pin-w" style="--n:${i}"><div class="pin-b">${starSolid()}${fmtRating(p.rating)}</div></div>`
+      ? `<div class="pin-w" style="--n:${i}"><div class="pin-b">${p.wish ? `${icon('bookmark')}To try` : `${starSolid()}${fmtRating(p.rating)}`}</div></div>`
       : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${photo(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div><div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div></div><span class="pin-more"></span></div></div>`;
     return el;
   }
@@ -807,6 +812,7 @@
   const prettyUrl = (u) => String(u).replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 
   function detailHtml(p) {
+    const wish = !!p.wish;
     const photos = p.photos.length ? p.photos : [null];
     const actions = [
       `<a class="action primary" href="${esc(directionsUrl(p))}" target="_blank" rel="noopener">${icon('go')}Directions</a>`,
@@ -815,7 +821,8 @@
       `<button class="action" data-share="${esc(p.id)}">${icon('share')}Share</button>`,
     ].filter(Boolean);
 
-    const sub = [p.area, p.visited ? `Tried ${longDate(p.visited)}` : ''].filter(Boolean).map(esc).join(' &middot; ');
+    const sub = [p.area, wish ? 'Not tried yet' : p.visited ? `Tried ${longDate(p.visited)}` : ''].filter(Boolean).map(esc).join(' &middot; ');
+    const eyebrow = wish ? [p.category, TIERS[tierOf(p)]].filter(Boolean).map(esc).join(' &middot; ') : metaLine(p, ['category', 'price']);
 
     const bubbles = p.comments.map((c, i) => `<div class="bubble ${i === p.comments.length - 1 ? 'tail' : ''}" style="--n:${i}">${esc(c)}</div>`).join('');
 
@@ -833,19 +840,27 @@
       </div>
       <div class="d-body">
         <div>
-          ${p.category || p.price ? `<p class="d-eyebrow">${metaLine(p, ['category', 'price'])}</p>` : ''}
+          ${eyebrow ? `<p class="d-eyebrow">${eyebrow}</p>` : ''}
           <h1 class="d-title">${esc(p.name)}</h1>
           ${sub ? `<p class="d-sub">${sub}</p>` : ''}
           ${p.tags.length ? `<div class="d-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
         </div>
 
+        ${wish ? `
+        <div class="score tryit">
+          <div class="tryit-icon">${icon('bookmark')}</div>
+          <div class="score-side">
+            <span class="tryit-title">Not tried yet</span>
+            <span class="score-verdict">On our To Try list</span>
+          </div>
+        </div>` : `
         <div class="score">
           <div class="score-num">${fmtRating(p.rating)}<small>/10</small></div>
           <div class="score-side">
             ${stars(p.rating, 'pop')}
             <span class="score-verdict">Our verdict: ${verdictOf(p)}</span>
           </div>
-        </div>
+        </div>`}
 
         <div class="actions" style="--n:${actions.length}">${actions.join('')}</div>
 
@@ -877,14 +892,15 @@
           ${rows ? `<div class="group" ${hasCoords(p) ? '' : ''}>${rows}</div>` : ''}
         </section>` : ''}
 
+        ${wish ? '<p class="try-foot" style="margin-top:22px">Once you go, send Claude your rating and a note, and it moves over to the Guide.</p>' : ''}
         ${p.photoCredit ? `<p class="credit">Photos: ${esc(p.photoCredit)}</p>` : ''}
       </div>`;
   }
 
-  function openPlace(id) {
-    const p = state.byId.get(id);
+  function openPlace(id, kind = 'place') {
+    const p = (kind === 'wish' ? state.wishById : state.byId).get(id);
     if (!p) { closeSheet(); return; }
-    openSheet('place', detailHtml(p));
+    openSheet(kind, detailHtml(p));
     sheet.id = id;
 
     const photos = $('#dPhotos');
@@ -947,7 +963,7 @@
       <div class="panel try-list">
         ${list.map((w, i) => `
           <a class="lrow" href="#/w/${esc(w.id)}" style="--n:${Math.min(i, 12)}">
-            ${mono(w)}
+            ${w.photos.length ? photo(w) : mono(w)}
             <div class="lrow-text">
               <div class="lrow-title">${esc(w.name)}</div>
               <div class="lrow-sub">${tierText(w)} &middot; ${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}</div>
@@ -965,21 +981,7 @@
   }
 
   function openWish(id) {
-    const w = state.wishById.get(id);
-    if (!w) { closeSheet(); return; }
-    openSheet('wish', `
-      <div class="compact-body wish">
-        ${mono(w, 'big')}
-        <p class="d-eyebrow">${[w.category, TIERS[tierOf(w)]].filter(Boolean).map(esc).join(' &middot; ')}</p>
-        <h2>${esc(w.name)}</h2>
-        ${w.note ? `<p>${esc(w.note)}</p>` : ''}
-        <div class="group wish-group">
-          ${w.address ? `<a class="row" href="${esc(wishDirections(w))}" target="_blank" rel="noopener"><div class="row-text"><div class="row-label">${esc(w.area || 'Address')}</div><div class="row-value">${esc(w.address)}</div></div><span class="row-icon">${icon('pin')}</span></a>` : `<div class="row"><div class="row-text"><div class="row-label">Where</div><div class="row-value">${esc(w.area || 'Auburn')}</div></div></div>`}
-        </div>
-        <a class="btn btn-primary btn-block" href="${esc(wishDirections(w))}" target="_blank" rel="noopener">${icon('go')}Directions</a>
-        <p class="try-foot">On the To Try list. Once you go, send Claude your rating and it moves to the Guide.</p>
-      </div>`, { compact: true });
-    sheet.id = id;
+    openPlace(id, 'wish');
   }
 
   /* ---------- Rankings sheet ---------- */
@@ -1141,7 +1143,7 @@
           <a class="btn btn-primary" href="#/p/${esc(w.id)}" data-replace>Let\u2019s go</a>
         </div>` : `
         <a class="pick-result" href="#/w/${esc(w.id)}" data-replace>
-          ${mono(w)}
+          ${w.photos.length ? photo(w, 0, true) : mono(w)}
           <div>
             <h3>${esc(w.name)}</h3>
             <p>${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}</p>
@@ -1161,10 +1163,10 @@
   /* ---------- Share + copy ---------- */
 
   async function sharePlace(id) {
-    const p = state.byId.get(id);
+    const p = state.byId.get(id) || state.wishById.get(id);
     if (!p) return;
-    const url = `${location.origin}${location.pathname}#/p/${encodeURIComponent(p.id)}`;
-    const text = `${p.name}: ${fmtRating(p.rating)}/10 on our Auburn Grub Guide`;
+    const url = `${location.origin}${location.pathname}#/${p.wish ? 'w' : 'p'}/${encodeURIComponent(p.id)}`;
+    const text = p.wish ? `${p.name} is on our To Try list` : `${p.name}: ${fmtRating(p.rating)}/10 on our Auburn Grub Guide`;
     try {
       if (navigator.share) { await navigator.share({ title: p.name, text, url }); return; }
       await navigator.clipboard.writeText(`${text}\n${url}`);

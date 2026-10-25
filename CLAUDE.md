@@ -64,7 +64,11 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 
 ## To Try list
 
-`data/wishlist.json` holds `{ "spots": [...] }`, each `{ id, name, category, tier, area, address?, lat?, lng?, note?, added }`. No photos (the app shows colored initials). When the user lists places they want to try, look each one up (Nominatim, then a web search), fill in category, tier, area and address, and add a short factual `note` only if it helps (e.g. "Inside the AC Hotel downtown"). Tier: "quick" for fast food and counter service, "sitdown" for table service or pricier spots. The user's own example: Botanic and Olivine are sit-down; Beyond the Wok and Cook Out are quick.
+`data/wishlist.json` holds `{ "spots": [...] }`. Each spot has the same details as a rated place except the rating and comments: `{ id, name, category, tier, area, added, blurb, address, lat, lng, phone?, website?, hours?, photos, photoCredit }`. Tapping one in the app opens the full detail page (photos, About, address, hours, phone, website) with a "Not tried yet" card where the rating would be. They are **not** shown on the Map tab.
+
+Adding to the list: research each place exactly like a rated spot (MapQuest page via DuckDuckGo gives address, phone, hours, coordinates, website and Yelp photo IDs), run `process_photo.py <id> ...` so photos land in `images/places/<id>/`, and write a short factual blurb. Tier: "quick" for fast food and counter service, "sitdown" for table service or pricier spots. The user's own example: Botanic and Olivine are sit-down; Beyond the Wok and Cook Out are quick.
+
+**When the user rates a place that's on the list:** move it. Copy its wishlist entry into `data/places.json` (keep id, photos, address, phone, hours, website, blurb, lat/lng, tier), add `rating`, `comments`, `price`, `tags`, a fresh `added` timestamp, then delete it from `wishlist.json`. Photos are already in `images/places/<id>/`, so no new photo work is needed unless the user sends their own.
 
 Editing or removing a spot works the same way: change `data/places.json` (and photos), validate, commit, push both.
 
