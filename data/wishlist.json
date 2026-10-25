@@ -245,28 +245,6 @@
       "photoCredit": "Jim 'N Nick's"
     },
     {
-      "id": "momma-goldbergs",
-      "name": "Momma Goldberg's Deli",
-      "category": "Deli",
-      "tier": "quick",
-      "area": "W Magnolia",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Auburn deli and hangout since 1976, known for its subs, nachos and laid-back patio. This is the W Magnolia location by campus.",
-      "address": "500 W Magnolia Ave, Auburn, AL 36832",
-      "lat": 32.606715,
-      "lng": -85.490649,
-      "phone": "(334) 821-0185",
-      "website": "https://www.mommagoldbergsdeli.com/",
-      "hours": "Daily 10am-9pm",
-      "photos": [
-        "images/places/momma-goldbergs/1.jpg",
-        "images/places/momma-goldbergs/2.jpg",
-        "images/places/momma-goldbergs/3.jpg",
-        "images/places/momma-goldbergs/4.jpg"
-      ],
-      "photoCredit": "Yelp reviewers"
-    },
-    {
       "id": "foosacklys",
       "name": "Foosackly's",
       "category": "Chicken",
