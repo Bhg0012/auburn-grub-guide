@@ -44,7 +44,31 @@ for (const [i, p] of places.entries()) {
   if (!p.photos || !p.photos.length) warnings.push(`${at}: no photos`);
 }
 
+// To Try list
+let wish = [];
+try {
+  wish = JSON.parse(readFileSync(join(root, 'data/wishlist.json'), 'utf8')).spots || [];
+} catch (err) {
+  errors.push(`data/wishlist.json is not valid JSON: ${err.message}`);
+}
+const norm = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, '');
+const ratedNames = new Set(places.map((p) => norm(p.name)));
+const wishIds = new Set();
+for (const [i, w] of wish.entries()) {
+  const at = `wishlist[${i}] (${w.name || 'no name'})`;
+  if (!w.name) errors.push(`${at}: missing "name"`);
+  if (!w.id || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(w.id)) errors.push(`${at}: "id" must be a lowercase slug`);
+  if (wishIds.has(w.id)) errors.push(`${at}: duplicate id "${w.id}"`);
+  wishIds.add(w.id);
+  if (!['quick', 'sitdown'].includes(w.tier)) errors.push(`${at}: "tier" must be "quick" or "sitdown"`);
+  if (ids.has(w.id) || ratedNames.has(norm(w.name))) errors.push(`${at}: already rated in places.json, remove it from the wishlist`);
+}
+for (const [i, p] of places.entries()) {
+  if (p.tier && !['quick', 'sitdown'].includes(p.tier)) errors.push(`places[${i}] (${p.name}): "tier" must be "quick" or "sitdown"`);
+  if (!p.tier) warnings.push(`places[${i}] (${p.name}): no "tier" (quick or sitdown) for the spinner`);
+}
+
 warnings.forEach((w) => console.warn(`warn  ${w}`));
 errors.forEach((e) => console.error(`error ${e}`));
-console.log(`${places.length} places checked, ${errors.length} errors, ${warnings.length} warnings`);
+console.log(`${places.length} places and ${wish.length} to-try spots checked, ${errors.length} errors, ${warnings.length} warnings`);
 process.exit(errors.length ? 1 : 0);

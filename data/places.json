@@ -5,6 +5,7 @@
       "name": "Flying Biscuit Café",
       "category": "Breakfast",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 8.0,
       "comments": [
         "Unique breakfast options you don't always see.",
@@ -39,6 +40,7 @@
       "name": "Sushi Kingdom",
       "category": "Sushi",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 8.4,
       "verdict": "Must-go",
       "comments": [
@@ -74,6 +76,7 @@
       "name": "Hattie B's Hot Chicken",
       "category": "Chicken",
       "price": "$$",
+      "tier": "quick",
       "rating": 6.8,
       "comments": [
         "Not bad, and it's open late downtown.",
@@ -112,6 +115,7 @@
       "name": "Roni's Mac Bar",
       "category": "Mac & Cheese",
       "price": "$$",
+      "tier": "quick",
       "rating": 7.6,
       "comments": [
         "Open late downtown.",
@@ -146,6 +150,7 @@
       "name": "Guthrie's",
       "category": "Chicken",
       "price": "$",
+      "tier": "quick",
       "rating": 7.0,
       "comments": [
         "Ole reliable.",
@@ -179,6 +184,7 @@
       "name": "Chipotle",
       "category": "Mexican",
       "price": "$",
+      "tier": "quick",
       "rating": 7.3,
       "comments": [
         "Like most Chipotles, so you know what you're getting for the most part.",
@@ -213,6 +219,7 @@
       "name": "Firehouse Subs",
       "category": "Subs",
       "price": "$",
+      "tier": "quick",
       "rating": 7.4,
       "comments": [
         "A little out of the way, but good if you're near the highway.",
@@ -247,6 +254,7 @@
       "name": "Toro Sushi",
       "category": "Sushi",
       "price": "$$",
+      "tier": "quick",
       "rating": 7.1,
       "comments": [
         "Pretty solid quality.",
@@ -278,6 +286,7 @@
       "name": "Chick-fil-A",
       "category": "Chicken",
       "price": "$",
+      "tier": "quick",
       "rating": 8.1,
       "comments": [
         "So many locations.",
@@ -312,6 +321,7 @@
       "name": "The Edge",
       "category": "Dining Hall",
       "price": "$$",
+      "tier": "quick",
       "rating": 7.4,
       "comments": [
         "Amazing breakfast.",
@@ -344,6 +354,7 @@
       "name": "Village Dining Hall",
       "category": "Dining Hall",
       "price": "$$",
+      "tier": "quick",
       "rating": 7.4,
       "comments": [
         "Nicer workers than The Edge.",
@@ -371,6 +382,7 @@
       "name": "Einstein Bros. Bagels",
       "category": "Bagels",
       "price": "$$",
+      "tier": "quick",
       "rating": 6.9,
       "comments": [
         "On the expensive side for what you get.",
@@ -402,6 +414,7 @@
       "name": "Tekila",
       "category": "Mexican",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 7.5,
       "comments": [
         "Cool drinks.",
@@ -438,6 +451,7 @@
       "name": "Agave Loco",
       "category": "Mexican",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 7.9,
       "comments": [
         "Smaller place, usually pretty busy.",
@@ -474,6 +488,7 @@
       "name": "Acapulco's Mexican Grill",
       "category": "Mexican",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 8.1,
       "comments": [
         "Can get really busy.",
@@ -511,6 +526,7 @@
       "name": "El Dorado",
       "category": "Mexican",
       "price": "$$",
+      "tier": "sitdown",
       "rating": 7.5,
       "comments": [
         "Normal Mexican food, nothing too special.",

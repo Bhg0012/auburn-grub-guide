@@ -5,6 +5,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 - `index.html`, `assets/styles.css`, `assets/app.js`: the app (iOS-style UI, Guide / Map / Stats tabs)
 - `data/places.json`: every spot. This is the only file that changes when a spot is added.
 - `images/places/<id>/1.jpg, 2.jpg, ...`: photos for each spot (first one is the cover)
+- `data/wishlist.json`: the To Try list (places they want to go but haven't rated yet)
 - `scripts/process_photo.py`: resizes/compresses downloaded photos into `images/places/<id>/`
 - `scripts/validate.mjs`: sanity-checks `data/places.json` (also runs in CI)
 - `.github/workflows/publish.yml`: merges any pushed `claude/*` branch into `main` automatically
@@ -34,6 +35,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
   "name": "Official Name",
   "category": "Breakfast",            // one word or two: Breakfast, Sushi, Burgers, Pizza, Mexican, BBQ, Coffee...
   "price": "$$",                      // $ to $$$$
+  "tier": "sitdown",                  // "quick" (cheap, counter/fast) or "sitdown" (pricier, table service); drives the spinner filter
   "rating": 8.2,                      // out of 10, exactly what the user said (stars show half of it)
   "verdict": "Must-go",               // optional: only when the user calls it that; overrides the rating-based label
   "comments": ["...", "..."],         // the user's own words, lightly cleaned up, one thought per bubble
@@ -57,6 +59,12 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
    Keep the user's comments in their voice. Don't invent opinions, dishes they "loved", or visit dates.
 6. **Check it:** `node scripts/validate.mjs`. To eyeball it, serve the folder (`http-server -p 8080 -c-1 .`) and screenshot with Playwright at 393x852 (Chromium is preinstalled).
 7. **Publish:** commit (`Add <Place> (<rating>/10)`), `git push -u origin <branch>`, then `git push origin HEAD:main`. GitHub Pages updates within a minute or two.
+
+**Always check the To Try list when adding a spot:** if the place is in `data/wishlist.json` (match by name, loosely: "Momma Goldberg's" = "momma goldbergs"), delete it from there in the same commit. `validate.mjs` errors if a rated place is still on the list.
+
+## To Try list
+
+`data/wishlist.json` holds `{ "spots": [...] }`, each `{ id, name, category, tier, area, address?, lat?, lng?, note?, added }`. No photos (the app shows colored initials). When the user lists places they want to try, look each one up (Nominatim, then a web search), fill in category, tier, area and address, and add a short factual `note` only if it helps (e.g. "Inside the AC Hotel downtown"). Tier: "quick" for fast food and counter service, "sitdown" for table service or pricier spots. The user's own example: Botanic and Olivine are sit-down; Beyond the Wok and Cook Out are quick.
 
 Editing or removing a spot works the same way: change `data/places.json` (and photos), validate, commit, push both.
 

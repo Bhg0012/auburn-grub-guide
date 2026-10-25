@@ -3,6 +3,7 @@
   'use strict';
 
   const DATA_URL = 'data/places.json';
+  const WISH_URL = 'data/wishlist.json';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
   const MAPLIBRE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js';
   const MAPLIBRE_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css';
@@ -42,6 +43,9 @@
     sparkle: '<path d="M12 3.5c.6 3.9 2.6 5.9 6.5 6.5-3.9.6-5.9 2.6-6.5 6.5-.6-3.9-2.6-5.9-6.5-6.5 3.9-.6 5.9-2.6 6.5-6.5Z"/><path d="M18.5 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z"/>',
     scope: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
     bubble: '<path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.3-.2-3.3-.6L4 20l1.3-3.7A7.2 7.2 0 0 1 4 11.5C4 7.4 7.6 4 12 4s8 3.4 8 7.5Z"/>',
+    bookmark: '<path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.3-6.5 4.3v-16a1 1 0 0 1 1-1Z"/>',
+    bolt: '<path d="M13.2 2.5 5 13.6h6.2L10.6 21.5 19 10.3h-6.3l.5-7.8Z"/>',
+    glass: '<path d="M7.5 3.5h9l-.6 5.6a3.9 3.9 0 0 1-7.8 0L7.5 3.5ZM12 13v7.5M8.5 20.5h7"/>',
     flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.9 3.2-6.3 4.4-10.3 2.6 1.7 3.7 4.3 3.4 6.6 1-.6 1.8-1.7 2.1-3 1.9 1.7 3.1 4.2 3.1 6.7 0 3.6-2.6 6.2-6.5 6.2Z"/>',
   };
   const STAR = 'M12 2.9l2.75 5.6 6.15.9-4.45 4.35 1.05 6.1L12 16.95 6.5 19.85l1.05-6.1L3.1 9.4l6.15-.9L12 2.9Z';
@@ -150,6 +154,11 @@
     sort: 'top',
     tab: 'guide',
     loaded: false,
+    wish: [],
+    wishById: new Map(),
+    tryFilter: 'all',
+    spinTier: 'any',
+    spinPool: 'both',
   };
 
   function normalize(raw) {
@@ -165,6 +174,25 @@
         mustTry: Array.isArray(p.mustTry) ? p.mustTry : [],
         tags: Array.isArray(p.tags) ? p.tags : [],
       }));
+  }
+
+  const TIERS = { quick: 'Quick', sitdown: 'Sit-down' };
+  const tierOf = (p) => (p.tier === 'quick' || p.tier === 'sitdown' ? p.tier : (p.price || '').length >= 3 ? 'sitdown' : 'quick');
+
+  function initials(name) {
+    const words = String(name).replace(/[^A-Za-z0-9 &']/g, '').split(/\s+/).filter((w) => w && !/^(the|of|on|and|&)$/i.test(w));
+    return (words.slice(0, 2).map((w) => w[0]).join('') || '?').toUpperCase();
+  }
+  const MONO_HUES = [18, 352, 330, 282, 238, 208, 178, 145, 42];
+  const monoHue = (id) => { let h = 0; for (const c of String(id)) h = (h * 33 + c.charCodeAt(0)) >>> 0; return MONO_HUES[h % MONO_HUES.length]; };
+  const mono = (w, cls = '') => `<div class="mono ${cls}" style="--h:${monoHue(w.id)}">${esc(initials(w.name))}</div>`;
+  const tierText = (p) => `<span class="tier-text ${tierOf(p)}">${TIERS[tierOf(p)]}</span>`;
+
+  function normalizeWish(raw) {
+    return ((raw && raw.spots) || []).filter((w) => w && w.name).map((w) => ({
+      ...w,
+      id: w.id || w.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    }));
   }
 
   const byTop = (a, b) => b.rating - a.rating || (b.visited || '').localeCompare(a.visited || '') || a.name.localeCompare(b.name);
@@ -615,7 +643,7 @@
 
   /* ---------- Tabs ---------- */
 
-  const TABS = ['guide', 'map', 'stats'];
+  const TABS = ['guide', 'map', 'try', 'stats'];
 
   function setTab(tab) {
     if (tab === state.tab) {
@@ -884,6 +912,76 @@
     }
   }
 
+  /* ---------- To Try ---------- */
+
+  function renderTry() {
+    const el = $('#tryBody');
+    const all = state.wish;
+    const quick = all.filter((w) => tierOf(w) === 'quick').length;
+    $('#tryEyebrow').textContent = all.length ? `${all.length} spots \u00b7 ${quick} quick \u00b7 ${all.length - quick} sit-down` : 'Still on the list';
+    if (!all.length) {
+      el.innerHTML = `
+        <div class="empty">
+          <div class="empty-art">${icon('bookmark')}</div>
+          <h3>Nothing left to try</h3>
+          <p>Tell Claude about places you want to go and they'll show up here.</p>
+        </div>`;
+      return;
+    }
+    const list = all
+      .filter((w) => state.tryFilter === 'all' || tierOf(w) === state.tryFilter)
+      .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+    const idx = ['all', 'quick', 'sitdown'].indexOf(state.tryFilter);
+    el.innerHTML = `
+      <button class="decide" data-open="pick" data-pool="new">
+        ${icon('dice')}
+        <div><h3>Spin for somewhere new</h3><p>Quick bite or a sit-down dinner</p></div>
+        ${icon('chev', 'chev')}
+      </button>
+      <div class="segmented seg-wide" id="tryFilter" role="tablist" aria-label="Filter" style="--i:${idx}">
+        <span class="segmented-thumb"></span>
+        <button role="tab" data-v="all" aria-selected="${idx === 0}">All ${all.length}</button>
+        <button role="tab" data-v="quick" aria-selected="${idx === 1}">Quick ${quick}</button>
+        <button role="tab" data-v="sitdown" aria-selected="${idx === 2}">Sit-down ${all.length - quick}</button>
+      </div>
+      <div class="panel try-list">
+        ${list.map((w, i) => `
+          <a class="lrow" href="#/w/${esc(w.id)}" style="--n:${Math.min(i, 12)}">
+            ${mono(w)}
+            <div class="lrow-text">
+              <div class="lrow-title">${esc(w.name)}</div>
+              <div class="lrow-sub">${tierText(w)} &middot; ${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}</div>
+            </div>
+            ${icon('chev', 'chev')}
+          </a>`).join('')}
+      </div>
+      <p class="try-foot">Tried one? Send Claude your rating and a note, and it moves over to the Guide.</p>`;
+  }
+
+  function wishDirections(w) {
+    const dest = w.address && /\d/.test(w.address) ? w.address : `${w.name}, ${w.address || 'Auburn, AL'}`;
+    if (isApple) return `https://maps.apple.com/?daddr=${encodeURIComponent(dest)}${hasCoords(w) ? `&sll=${w.lat},${w.lng}` : ''}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${w.name}, ${w.address || 'Auburn, AL'}`)}`;
+  }
+
+  function openWish(id) {
+    const w = state.wishById.get(id);
+    if (!w) { closeSheet(); return; }
+    openSheet('wish', `
+      <div class="compact-body wish">
+        ${mono(w, 'big')}
+        <p class="d-eyebrow">${[w.category, TIERS[tierOf(w)]].filter(Boolean).map(esc).join(' &middot; ')}</p>
+        <h2>${esc(w.name)}</h2>
+        ${w.note ? `<p>${esc(w.note)}</p>` : ''}
+        <div class="group wish-group">
+          ${w.address ? `<a class="row" href="${esc(wishDirections(w))}" target="_blank" rel="noopener"><div class="row-text"><div class="row-label">${esc(w.area || 'Address')}</div><div class="row-value">${esc(w.address)}</div></div><span class="row-icon">${icon('pin')}</span></a>` : `<div class="row"><div class="row-text"><div class="row-label">Where</div><div class="row-value">${esc(w.area || 'Auburn')}</div></div></div>`}
+        </div>
+        <a class="btn btn-primary btn-block" href="${esc(wishDirections(w))}" target="_blank" rel="noopener">${icon('go')}Directions</a>
+        <p class="try-foot">On the To Try list. Once you go, send Claude your rating and it moves to the Guide.</p>
+      </div>`, { compact: true });
+    sheet.id = id;
+  }
+
   /* ---------- Rankings sheet ---------- */
 
   function openRanks() {
@@ -924,47 +1022,86 @@
 
   const spin = { cancel: null };
 
+
+  function spinPool() {
+    const t = state.spinTier;
+    const keep = (x) => t === 'any' || tierOf(x) === t;
+    const been = state.spinPool === 'new' ? [] : state.places.filter(keep).map((p) => ({ kind: 'place', item: p }));
+    const fresh = state.spinPool === 'been' ? [] : state.wish.filter(keep).map((w) => ({ kind: 'wish', item: w }));
+    return [...been, ...fresh];
+  }
+
+  const segHtml = (id, value, opts) => {
+    const idx = Math.max(0, opts.findIndex(([v]) => v === value));
+    return `<div class="segmented seg-wide" id="${id}" role="tablist" style="--i:${idx}">
+      <span class="segmented-thumb"></span>
+      ${opts.map(([v, label], k) => `<button role="tab" data-v="${v}" aria-selected="${k === idx}">${label}</button>`).join('')}
+    </div>`;
+  };
+
+  function updatePickCount() {
+    const n = spinPool().length;
+    const c = $('#pickCount');
+    if (c) c.textContent = n ? `${n} ${n === 1 ? 'spot' : 'spots'} in the mix` : 'Nothing matches. Try another filter.';
+    const btn = $('#spinBtn');
+    if (btn) btn.disabled = n === 0;
+  }
+
+  function openPick() {
+    if (state.places.length + state.wish.length < 2) {
+      toast('Add a few spots first', 'dice');
+      return;
+    }
+    openSheet('pick', `
+      <div class="compact-body">
+        <h2>Where should we eat?</h2>
+        <div class="pick-filters">
+          ${segHtml('spinTier', state.spinTier, [['any', 'Any'], ['quick', 'Quick'], ['sitdown', 'Sit-down']])}
+          ${segHtml('spinPool', state.spinPool, [['new', 'New to us'], ['been', 'Been there'], ['both', 'Both']])}
+        </div>
+        <div class="slot"><div class="slot-line"></div><div class="slot-reel" id="reel"></div></div>
+        <p class="pick-count" id="pickCount"></p>
+        <div id="pickResult"></div>
+        <button class="btn btn-primary btn-block" id="spinBtn">${icon('dice')}Spin</button>
+      </div>`, { compact: true });
+    resetReel();
+    updatePickCount();
+  }
+
+  function resetReel() {
+    const reel = $('#reel');
+    if (!reel) return;
+    const pool = spinPool();
+    const names = pool.length ? [...pool].sort(() => Math.random() - 0.5) : [{ item: { name: '\u2013' } }];
+    reel.style.transition = 'none';
+    reel.innerHTML = [0, 1, 2].map((k) => `<div class="slot-item">${esc(names[k % names.length].item.name)}</div>`).join('');
+    reel.style.transform = 'translateY(-52px)';
+  }
+
+  // Rated spots land more often the higher they're rated; new spots count like a 7.5.
   function weightedPick(list) {
-    const w = list.map((p) => Math.pow(Math.max(0.3, p.rating / 2 - 1.5), 2.2));
+    const w = list.map((x) => Math.pow(Math.max(0.3, (x.kind === 'wish' ? 7.5 : x.item.rating) / 2 - 1.5), 2.2));
     let r = Math.random() * w.reduce((a, b) => a + b, 0);
     for (let i = 0; i < list.length; i++) { r -= w[i]; if (r <= 0) return list[i]; }
     return list[list.length - 1];
   }
 
-  function openPick() {
-    if (state.places.length < 2) {
-      toast(state.places.length ? 'Add one more spot to spin' : 'Add a spot first', 'dice');
-      return;
-    }
-    openSheet('pick', `
-      <div class="compact-body">
-        <h2>Where to tonight?</h2>
-        <p>We’ll spin through your guide. Higher rated spots land more often.</p>
-        <div class="slot"><div class="slot-line"></div><div class="slot-reel" id="reel"></div></div>
-        <div id="pickResult"></div>
-        <button class="btn btn-primary btn-block" id="spinBtn">${icon('dice')}Spin</button>
-      </div>`, { compact: true });
-    const reel = $('#reel');
-    const names = [...state.places].sort(() => Math.random() - 0.5);
-    reel.innerHTML = names.slice(0, 3).map((p) => `<div class="slot-item">${esc(p.name)}</div>`).join('');
-    reel.style.transform = 'translateY(-52px)';
-  }
-
   function doSpin() {
     const reel = $('#reel');
     const btn = $('#spinBtn');
-    if (!reel || btn.disabled) return;
-    const winner = weightedPick(state.places);
-    const pool = state.places;
+    const pool = spinPool();
+    if (!reel || btn.disabled || !pool.length) return;
+    const winner = weightedPick(pool);
     const count = 34;
     const items = [];
     for (let i = 0; i < count; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
     items.push(winner, pool[Math.floor(Math.random() * pool.length)]);
     reel.style.transition = 'none';
     reel.style.transform = 'translateY(0)';
-    reel.innerHTML = items.map((p) => `<div class="slot-item">${esc(p.name)}</div>`).join('');
+    reel.innerHTML = items.map((x) => `<div class="slot-item">${esc(x.item.name)}</div>`).join('');
     $('#pickResult').innerHTML = '';
     btn.disabled = true;
+    $$('.pick-filters button').forEach((b) => { b.disabled = true; });
     void reel.offsetHeight;
 
     const target = -(count * 52);
@@ -988,18 +1125,32 @@
       haptic(18);
       const res = $('#pickResult');
       if (!res) return;
-      res.innerHTML = `
-        <a class="pick-result" href="#/p/${esc(winner.id)}" data-replace>
-          ${photo(winner, 0, true)}
+      $$('.pick-filters button').forEach((b) => { b.disabled = false; });
+      const w = winner.item;
+      res.innerHTML = winner.kind === 'place' ? `
+        <a class="pick-result" href="#/p/${esc(w.id)}" data-replace>
+          ${photo(w, 0, true)}
           <div>
-            <h3>${esc(winner.name)}</h3>
-            <p>${metaLine(winner)}</p>
-            ${stars(winner.rating)}
+            <h3>${esc(w.name)}</h3>
+            <p>${metaLine(w)}</p>
+            ${stars(w.rating)}
           </div>
         </a>
         <div class="btn-row" style="margin-bottom:10px">
           <button class="btn btn-tinted" id="spinAgain">Spin again</button>
-          <a class="btn btn-primary" href="#/p/${esc(winner.id)}" data-replace>Let’s go</a>
+          <a class="btn btn-primary" href="#/p/${esc(w.id)}" data-replace>Let\u2019s go</a>
+        </div>` : `
+        <a class="pick-result" href="#/w/${esc(w.id)}" data-replace>
+          ${mono(w)}
+          <div>
+            <h3>${esc(w.name)}</h3>
+            <p>${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}</p>
+            <span class="pick-new">New to us &middot; ${TIERS[tierOf(w)]}</span>
+          </div>
+        </a>
+        <div class="btn-row" style="margin-bottom:10px">
+          <button class="btn btn-tinted" id="spinAgain">Spin again</button>
+          <a class="btn btn-primary" href="${esc(wishDirections(w))}" target="_blank" rel="noopener">Let\u2019s go</a>
         </div>`;
       btn.hidden = true;
     }, dur + 60);
@@ -1036,6 +1187,7 @@
   function parseRoute() {
     const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     if (h.startsWith('p/')) return { kind: 'place', id: h.slice(2) };
+    if (h.startsWith('w/')) return { kind: 'wish', id: h.slice(2) };
     if (h === 'add') return { kind: 'add' };
     if (h === 'pick') return { kind: 'pick' };
     if (h === 'ranks') return { kind: 'ranks' };
@@ -1046,9 +1198,9 @@
     const r = parseRoute();
     if (!r.kind) { hideSheet(); return; }
     if (!state.loaded) return;
-    const same = sheet.kind === r.kind && (r.kind !== 'place' || sheet.id === r.id);
+    const same = sheet.kind === r.kind && ((r.kind !== 'place' && r.kind !== 'wish') || sheet.id === r.id);
     if (same) return;
-    const open = () => ({ place: () => openPlace(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
+    const open = () => ({ place: () => openPlace(r.id), wish: () => openWish(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
     if (sheet.kind) {
       hideSheet();
       sheet.closeTimer && clearTimeout(sheet.closeTimer);
@@ -1096,7 +1248,31 @@
         return;
       }
       const open = e.target.closest('[data-open]');
-      if (open) { go(`#/${open.dataset.open}`); return; }
+      if (open) {
+        if (open.dataset.pool) state.spinPool = open.dataset.pool;
+        go(`#/${open.dataset.open}`);
+        return;
+      }
+      const segBtn = e.target.closest('#tryFilter button, #spinTier button, #spinPool button');
+      if (segBtn) {
+        const seg = segBtn.parentElement;
+        const btns = $$('button', seg);
+        const k = btns.indexOf(segBtn);
+        if (segBtn.getAttribute('aria-selected') === 'true' || segBtn.disabled) return;
+        haptic(6);
+        seg.style.setProperty('--i', k);
+        btns.forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
+        const v = segBtn.dataset.v;
+        if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(renderTry, 160); }
+        else {
+          if (seg.id === 'spinTier') state.spinTier = v; else state.spinPool = v;
+          $('#pickResult').innerHTML = '';
+          $('#spinBtn').hidden = false;
+          resetReel();
+          updatePickCount();
+        }
+        return;
+      }
       const share = e.target.closest('[data-share]');
       if (share) { sharePlace(share.dataset.share); return; }
       if (e.target.closest('[data-copy]')) { copyTemplate(); return; }
@@ -1155,17 +1331,18 @@
 
   async function load() {
     skeleton();
-    try {
-      const res = await fetch(DATA_URL, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(res.status);
-      state.places = normalize(await res.json());
-    } catch (err) {
-      console.error('Could not load places', err);
-      state.places = [];
-    }
+    const get = (url) => fetch(url, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const [places, wish] = await Promise.all([
+      get(DATA_URL).catch((err) => { console.error('Could not load places', err); return null; }),
+      get(WISH_URL).catch((err) => { console.error('Could not load wishlist', err); return null; }),
+    ]);
+    state.places = normalize(places);
+    state.wish = normalizeWish(wish);
     state.byId = new Map(state.places.map((p) => [p.id, p]));
+    state.wishById = new Map(state.wish.map((w) => [w.id, w]));
     state.loaded = true;
     renderGuide();
+    renderTry();
     renderStats();
     if (mapState.map) drawPins();
     applyRoute();
