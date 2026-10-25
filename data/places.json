@@ -629,6 +629,46 @@
         "images/places/cook-out/5.jpg"
       ],
       "photoCredit": "Cook Out and Yelp reviewers"
+    },
+    {
+      "id": "hey-day",
+      "name": "Hey Day Market",
+      "category": "Food Hall",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 7.5,
+      "comments": [
+        "Cool options.",
+        "Good location.",
+        "Cute.",
+        "Fun with friends.",
+        "You can use dining dollars.",
+        "But it is expensive."
+      ],
+      "mustTry": [
+        "Chips and queso"
+      ],
+      "tags": [
+        "Dining dollars",
+        "Mini golf",
+        "Downtown"
+      ],
+      "added": "2026-10-25T15:30:00",
+      "blurb": "Food hall and hangout on South College with a handful of food counters under one roof, a bar, and a lawn with mini golf.",
+      "address": "211 S College St, Auburn, AL 36830",
+      "area": "Downtown",
+      "lat": 32.60365,
+      "lng": -85.481475,
+      "website": "https://heydaymarketauburn.com/",
+      "hours": "Daily 10:30am-9pm",
+      "photos": [
+        "images/places/hey-day/1.jpg",
+        "images/places/hey-day/2.jpg",
+        "images/places/hey-day/3.jpg",
+        "images/places/hey-day/4.jpg",
+        "images/places/hey-day/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
     }
   ]
 }

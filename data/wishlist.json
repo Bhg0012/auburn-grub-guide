@@ -91,28 +91,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "hey-day",
-      "name": "Hey Day Market",
-      "category": "Food Hall",
-      "tier": "quick",
-      "area": "Downtown",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Food hall and hangout on South College with a handful of food counters under one roof, a bar, and a lawn with mini golf.",
-      "address": "211 S College St, Auburn, AL 36830",
-      "lat": 32.60365,
-      "lng": -85.481475,
-      "website": "https://heydaymarketauburn.com/",
-      "hours": "Daily 10:30am-9pm",
-      "photos": [
-        "images/places/hey-day/1.jpg",
-        "images/places/hey-day/2.jpg",
-        "images/places/hey-day/3.jpg",
-        "images/places/hey-day/4.jpg",
-        "images/places/hey-day/5.jpg"
-      ],
-      "photoCredit": "Yelp reviewers"
-    },
-    {
       "id": "olivine",
       "name": "Olivine Rooftop",
       "category": "Italian",
