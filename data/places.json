@@ -554,6 +554,43 @@
         "images/places/el-dorado/5.jpg"
       ],
       "photoCredit": "Yelp reviewers and The Auburn Plainsman"
+    },
+    {
+      "id": "chicken-salad-chick",
+      "name": "Chicken Salad Chick",
+      "category": "Chicken Salad",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 6.7,
+      "comments": [
+        "Good food.",
+        "High calories.",
+        "Fast service.",
+        "High cost for the small portions."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Started in Auburn",
+        "Fast service",
+        "Closed Sundays"
+      ],
+      "added": "2026-10-25T14:30:00",
+      "blurb": "The chicken salad chain that started right here in Auburn in 2008. A long list of chicken salad flavors plus pimento cheese, soups and sides. Closed Sundays.",
+      "address": "1345 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.622137,
+      "lng": -85.453584,
+      "phone": "(334) 459-9752",
+      "website": "https://www.chickensaladchick.com/auburn-opelika/",
+      "hours": "Mon-Sat 10am-8pm, Sun closed",
+      "photos": [
+        "images/places/chicken-salad-chick/1.jpg",
+        "images/places/chicken-salad-chick/2.jpg",
+        "images/places/chicken-salad-chick/3.jpg",
+        "images/places/chicken-salad-chick/4.jpg",
+        "images/places/chicken-salad-chick/5.jpg"
+      ],
+      "photoCredit": "Chicken Salad Chick"
     }
   ]
 }

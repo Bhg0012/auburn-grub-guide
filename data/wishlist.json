@@ -538,29 +538,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "chicken-salad-chick",
-      "name": "Chicken Salad Chick",
-      "category": "Chicken Salad",
-      "tier": "quick",
-      "area": "Opelika Rd",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "The chicken salad chain that started right here in Auburn in 2008. A long list of chicken salad flavors plus pimento cheese, soups and sides. Closed Sundays.",
-      "address": "1345 Opelika Rd, Auburn, AL 36830",
-      "lat": 32.622137,
-      "lng": -85.453584,
-      "phone": "(334) 459-9752",
-      "website": "https://www.chickensaladchick.com/auburn-opelika/",
-      "hours": "Mon-Sat 10am-8pm, Sun closed",
-      "photos": [
-        "images/places/chicken-salad-chick/1.jpg",
-        "images/places/chicken-salad-chick/2.jpg",
-        "images/places/chicken-salad-chick/3.jpg",
-        "images/places/chicken-salad-chick/4.jpg",
-        "images/places/chicken-salad-chick/5.jpg"
-      ],
-      "photoCredit": "Chicken Salad Chick"
-    },
-    {
       "id": "auburn-plaza",
       "name": "Auburn Plaza Bar & Lounge",
       "category": "Gastropub",
