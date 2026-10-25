@@ -4,7 +4,7 @@
 
   const DATA_URL = 'data/places.json';
   const WISH_URL = 'data/wishlist.json';
-  const CLAUDE_URL = 'https://claude.ai/code/session_015BjXjcynLabXApgbGQSzhx';
+  const CLAUDE_URL = 'https://claude.ai/code/session_01PeoFMSiHywAAnfNcVtdGFH';
   const PENDING_KEY = 'grubguide.pending';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
   const MAPLIBRE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js';
