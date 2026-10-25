@@ -312,28 +312,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "cook-out",
-      "name": "Cook Out",
-      "category": "Burgers",
-      "tier": "quick",
-      "area": "Opelika Rd",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Late-night drive-thru famous for 40-plus milkshake flavors and cheap trays with burgers, BBQ, hot dogs and hush puppies. Open until 3am, 4am on weekends.",
-      "address": "1601 Opelika Rd, Auburn, AL 36830",
-      "lat": 32.624551,
-      "lng": -85.448118,
-      "website": "https://www.cookout.com/",
-      "hours": "Mon-Thu 10:30am-3am, Fri-Sat 10:30am-4am, Sun 10:30am-3am",
-      "photos": [
-        "images/places/cook-out/1.jpg",
-        "images/places/cook-out/2.jpg",
-        "images/places/cook-out/3.jpg",
-        "images/places/cook-out/4.jpg",
-        "images/places/cook-out/5.jpg"
-      ],
-      "photoCredit": "Cook Out and Yelp reviewers"
-    },
-    {
       "id": "culvers",
       "name": "Culver's",
       "category": "Burgers",
