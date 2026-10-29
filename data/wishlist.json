@@ -46,28 +46,6 @@
       "photoCredit": "Taco Bell"
     },
     {
-      "id": "captain-ds",
-      "name": "Captain D's",
-      "category": "Seafood",
-      "tier": "quick",
-      "area": "Opelika Rd",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Fast-casual seafood chain going since 1969, known for batter-dipped fish, hush puppies and shrimp platters.",
-      "address": "1800 Opelika Rd, Auburn, AL 36830",
-      "lat": 32.626001,
-      "lng": -85.442864,
-      "phone": "(334) 821-3507",
-      "website": "https://www.captainds.com/",
-      "hours": "Daily 10:45am-10pm",
-      "photos": [
-        "images/places/captain-ds/1.jpg",
-        "images/places/captain-ds/2.jpg",
-        "images/places/captain-ds/3.jpg",
-        "images/places/captain-ds/4.jpg"
-      ],
-      "photoCredit": "Captain D's and Yelp reviewers"
-    },
-    {
       "id": "waldos",
       "name": "Waldo's Chicken & Beer",
       "category": "Chicken",

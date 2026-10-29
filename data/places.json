@@ -788,6 +788,43 @@
         "images/places/waffle-house/5.jpg"
       ],
       "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "captain-ds",
+      "name": "Captain D's",
+      "category": "Seafood",
+      "price": "$",
+      "tier": "quick",
+      "rating": 6.6,
+      "comments": [
+        "Cool atmosphere, feels comfy and homey.",
+        "Quick service.",
+        "Solid food, nothing crazy."
+      ],
+      "mustTry": [
+        "Mac n cheese"
+      ],
+      "tags": [
+        "Homey feel",
+        "Quick service",
+        "Since 1969"
+      ],
+      "added": "2026-10-28T19:05:00",
+      "blurb": "Fast-casual seafood chain going since 1969, known for batter-dipped fish, hush puppies and shrimp platters.",
+      "address": "1800 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.626001,
+      "lng": -85.442864,
+      "phone": "(334) 821-3507",
+      "website": "https://www.captainds.com/",
+      "hours": "Daily 10:45am-10pm",
+      "photos": [
+        "images/places/captain-ds/1.jpg",
+        "images/places/captain-ds/2.jpg",
+        "images/places/captain-ds/3.jpg",
+        "images/places/captain-ds/4.jpg"
+      ],
+      "photoCredit": "Captain D's and Yelp reviewers"
     }
   ]
 }
