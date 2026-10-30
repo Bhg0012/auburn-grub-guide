@@ -554,6 +554,319 @@
         "images/places/el-dorado/5.jpg"
       ],
       "photoCredit": "Yelp reviewers and The Auburn Plainsman"
+    },
+    {
+      "id": "chicken-salad-chick",
+      "name": "Chicken Salad Chick",
+      "category": "Chicken Salad",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 6.7,
+      "comments": [
+        "Good food.",
+        "High calories.",
+        "Fast service.",
+        "High cost for the small portions."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Started in Auburn",
+        "Fast service",
+        "Closed Sundays"
+      ],
+      "added": "2026-10-25T14:30:00",
+      "blurb": "The chicken salad chain that started right here in Auburn in 2008. A long list of chicken salad flavors plus pimento cheese, soups and sides. Closed Sundays.",
+      "address": "1345 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.622137,
+      "lng": -85.453584,
+      "phone": "(334) 459-9752",
+      "website": "https://www.chickensaladchick.com/auburn-opelika/",
+      "hours": "Mon-Sat 10am-8pm, Sun closed",
+      "photos": [
+        "images/places/chicken-salad-chick/1.jpg",
+        "images/places/chicken-salad-chick/2.jpg",
+        "images/places/chicken-salad-chick/3.jpg",
+        "images/places/chicken-salad-chick/4.jpg",
+        "images/places/chicken-salad-chick/5.jpg"
+      ],
+      "photoCredit": "Chicken Salad Chick"
+    },
+    {
+      "id": "cook-out",
+      "name": "Cook Out",
+      "category": "Burgers",
+      "price": "$",
+      "tier": "quick",
+      "rating": 7.4,
+      "comments": [
+        "Solid quality.",
+        "Lots of options.",
+        "Cheap price.",
+        "Quick service.",
+        "Open late.",
+        "Good milkshakes."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Open late",
+        "Drive-thru",
+        "Milkshakes"
+      ],
+      "added": "2026-10-25T15:00:00",
+      "blurb": "Late-night drive-thru famous for 40-plus milkshake flavors and cheap trays with burgers, BBQ, hot dogs and hush puppies. Open until 3am, 4am on weekends.",
+      "address": "1601 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.624551,
+      "lng": -85.448118,
+      "website": "https://www.cookout.com/",
+      "hours": "Mon-Thu 10:30am-3am, Fri-Sat 10:30am-4am, Sun 10:30am-3am",
+      "photos": [
+        "images/places/cook-out/1.jpg",
+        "images/places/cook-out/2.jpg",
+        "images/places/cook-out/3.jpg",
+        "images/places/cook-out/4.jpg",
+        "images/places/cook-out/5.jpg"
+      ],
+      "photoCredit": "Cook Out and Yelp reviewers"
+    },
+    {
+      "id": "hey-day",
+      "name": "Hey Day Market",
+      "category": "Food Hall",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 7.3,
+      "comments": [
+        "Cool options.",
+        "Good location.",
+        "Cute.",
+        "Fun with friends.",
+        "You can use dining dollars.",
+        "But it is expensive."
+      ],
+      "mustTry": [
+        "Chips and queso"
+      ],
+      "tags": [
+        "Dining dollars",
+        "Mini golf",
+        "Downtown"
+      ],
+      "added": "2026-10-25T15:30:00",
+      "blurb": "Food hall and hangout on South College with a handful of food counters under one roof, a bar, and a lawn with mini golf.",
+      "address": "211 S College St, Auburn, AL 36830",
+      "area": "Downtown",
+      "lat": 32.60365,
+      "lng": -85.481475,
+      "website": "https://heydaymarketauburn.com/",
+      "hours": "Daily 10:30am-9pm",
+      "photos": [
+        "images/places/hey-day/1.jpg",
+        "images/places/hey-day/2.jpg",
+        "images/places/hey-day/3.jpg",
+        "images/places/hey-day/4.jpg",
+        "images/places/hey-day/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "momma-goldbergs",
+      "name": "Momma Goldberg's Deli",
+      "category": "Deli",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 6.9,
+      "comments": [
+        "Auburn staple, famous.",
+        "Decent quality.",
+        "But very expensive for what you get.",
+        "Average service.",
+        "Great location.",
+        "Can get busy."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Auburn staple",
+        "Since 1976",
+        "Near campus"
+      ],
+      "added": "2026-10-25T16:00:00",
+      "blurb": "Auburn deli and hangout since 1976, known for its subs, nachos and laid-back patio. This is the W Magnolia location by campus.",
+      "address": "500 W Magnolia Ave, Auburn, AL 36832",
+      "area": "W Magnolia",
+      "lat": 32.606715,
+      "lng": -85.490649,
+      "phone": "(334) 821-0185",
+      "website": "https://www.mommagoldbergsdeli.com/",
+      "hours": "Daily 10am-9pm",
+      "photos": [
+        "images/places/momma-goldbergs/1.jpg",
+        "images/places/momma-goldbergs/2.jpg",
+        "images/places/momma-goldbergs/3.jpg",
+        "images/places/momma-goldbergs/4.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "panda-express",
+      "name": "Panda Express",
+      "category": "Chinese",
+      "price": "$",
+      "tier": "quick",
+      "rating": 7.7,
+      "comments": [
+        "Very quick service.",
+        "The online menu doesn't match the physical inventory sometimes.",
+        "Good quality.",
+        "Lots of food for the price.",
+        "High protein.",
+        "High sodium, so make sure you drink your water."
+      ],
+      "mustTry": [
+        "Honey walnut shrimp",
+        "Teriyaki chicken"
+      ],
+      "tags": [
+        "On campus",
+        "Big portions",
+        "Closed weekends"
+      ],
+      "added": "2026-10-25T16:30:00",
+      "blurb": "Panda Express on Auburn's campus, with orange chicken, chow mein, fried rice and the rest of the usual lineup. It keeps campus hours, so it's closed on weekends.",
+      "address": "1310 Wilmore Dr, Auburn, AL 36849",
+      "area": "Campus",
+      "lat": 32.605012,
+      "lng": -85.485264,
+      "phone": "(334) 844-1818",
+      "website": "https://www.pandaexpress.com/",
+      "hours": "Mon-Thu 10am-9pm, Fri 10am-6pm, Sat-Sun closed",
+      "photos": [
+        "images/places/panda-express/1.jpg",
+        "images/places/panda-express/2.jpg",
+        "images/places/panda-express/3.jpg",
+        "images/places/panda-express/4.jpg",
+        "images/places/panda-express/5.jpg"
+      ],
+      "photoCredit": "Panda Express"
+    },
+    {
+      "id": "waffle-house",
+      "name": "Waffle House",
+      "category": "Breakfast",
+      "price": "$",
+      "tier": "quick",
+      "rating": 7.3,
+      "comments": [
+        "Price is average.",
+        "Decent quality.",
+        "Open late.",
+        "Good for people watching.",
+        "Inside seating hours are weird during the weekend.",
+        "Service is hit or miss."
+      ],
+      "mustTry": [],
+      "tags": [
+        "Open late",
+        "People watching",
+        "Several locations"
+      ],
+      "added": "2026-10-25T17:00:00",
+      "blurb": "The 24-hour Southern classic. This one is on Bent Creek Road by I-85, and there are others on W Glenn Ave and Opelika Rd.",
+      "address": "2346 Bent Creek Rd, Auburn, AL 36830",
+      "area": "Bent Creek Rd",
+      "lat": 32.607527,
+      "lng": -85.430976,
+      "phone": "(334) 887-2087",
+      "website": "https://www.wafflehouse.com/",
+      "hours": "Open 24 hours",
+      "photos": [
+        "images/places/waffle-house/1.jpg",
+        "images/places/waffle-house/2.jpg",
+        "images/places/waffle-house/3.jpg",
+        "images/places/waffle-house/4.jpg",
+        "images/places/waffle-house/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "captain-ds",
+      "name": "Captain D's",
+      "category": "Seafood",
+      "price": "$",
+      "tier": "quick",
+      "rating": 6.6,
+      "comments": [
+        "Cool atmosphere, feels comfy and homey.",
+        "Quick service.",
+        "Solid food, nothing crazy."
+      ],
+      "mustTry": [
+        "Mac n cheese"
+      ],
+      "tags": [
+        "Homey feel",
+        "Quick service",
+        "Since 1969"
+      ],
+      "added": "2026-10-28T19:05:00",
+      "blurb": "Fast-casual seafood chain going since 1969, known for batter-dipped fish, hush puppies and shrimp platters.",
+      "address": "1800 Opelika Rd, Auburn, AL 36830",
+      "area": "Opelika Rd",
+      "lat": 32.626001,
+      "lng": -85.442864,
+      "phone": "(334) 821-3507",
+      "website": "https://www.captainds.com/",
+      "hours": "Daily 10:45am-10pm",
+      "photos": [
+        "images/places/captain-ds/1.jpg",
+        "images/places/captain-ds/2.jpg",
+        "images/places/captain-ds/3.jpg",
+        "images/places/captain-ds/4.jpg"
+      ],
+      "photoCredit": "Captain D's and Yelp reviewers"
+    },
+    {
+      "id": "culvers",
+      "name": "Culver's",
+      "category": "Burgers",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 8.0,
+      "verdict": "Must-go",
+      "comments": [
+        "Amazing quality.",
+        "Super fast service.",
+        "Clean interior.",
+        "Delicious for fast food.",
+        "On the pricey side."
+      ],
+      "mustTry": [
+        "Any of the ButterBurgers",
+        "Concrete mixer"
+      ],
+      "tags": [
+        "Frozen custard",
+        "Fast service",
+        "Open late"
+      ],
+      "added": "2026-10-29T21:15:00",
+      "blurb": "Midwest chain known for ButterBurgers, Wisconsin cheese curds and fresh frozen custard concretes.",
+      "address": "2080 E University Dr, Auburn, AL 36830",
+      "area": "E University Dr",
+      "lat": 32.6266,
+      "lng": -85.4492,
+      "phone": "(334) 209-2708",
+      "website": "https://www.culvers.com/",
+      "hours": "Daily 10:30am-11pm",
+      "photos": [
+        "images/places/culvers/1.jpg",
+        "images/places/culvers/2.jpg",
+        "images/places/culvers/3.jpg",
+        "images/places/culvers/4.jpg",
+        "images/places/culvers/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
     }
   ]
 }
