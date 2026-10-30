@@ -21,8 +21,8 @@
   <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="stylesheet" href="assets/styles.css?v=99640bc88a">
-  <script src="assets/app.js?v=a50461148d" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=1042c12d32">
+  <script src="assets/app.js?v=63afc0f866" defer></script>
 </head>
 <body>
   <div id="app">
@@ -87,7 +87,7 @@
       <header class="nav">
         <div class="nav-title">To Try</div>
         <div class="nav-actions">
-          <button class="glass-btn" data-tryview="map" aria-label="Show on a map"><svg class="ic" data-icon="map"></svg></button>
+          <button class="glass-btn" data-wishmap aria-label="Show on the map"><svg class="ic" data-icon="map"></svg></button>
           <button class="glass-btn" data-open="new" aria-label="Add a place"><svg class="ic" data-icon="plus"></svg></button>
         </div>
       </header>
@@ -99,27 +99,6 @@
         <div id="tryActivity"></div>
         <div id="tryBody"></div>
       </div>
-    </section>
-
-    <!-- To Try map -->
-    <section class="screen screen--map" id="screen-trymap" data-tab="trymap" aria-label="To Try map">
-      <div id="tryMapHost" class="map"></div>
-      <button class="glass-btn map-back" id="tryMapList" aria-label="Show the list"><svg class="ic" data-icon="list"></svg></button>
-      <div class="map-top glass">
-        <span class="map-top-title">To Try</span>
-        <span class="map-top-count" id="tryMapCount"></span>
-      </div>
-      <div class="segmented map-filter glass" id="tryMapFilter" role="tablist" aria-label="Filter">
-        <span class="segmented-thumb"></span>
-        <button role="tab" data-v="all" aria-selected="true">All</button>
-        <button role="tab" data-v="quick" aria-selected="false">Quick</button>
-        <button role="tab" data-v="sitdown" aria-selected="false">Sit-down</button>
-      </div>
-      <div class="map-btns">
-        <button class="glass-btn" id="tryMapFit" aria-label="Show all spots"><svg class="ic" data-icon="scope"></svg></button>
-        <button class="glass-btn map-me" aria-label="Show where I am"><svg class="ic" data-icon="locate"></svg></button>
-      </div>
-      <div class="map-preview" id="tryMapPreview"></div>
     </section>
 
     <!-- Stats -->

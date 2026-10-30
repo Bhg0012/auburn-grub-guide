@@ -7,7 +7,6 @@
   const CLAUDE_URL = 'https://claude.ai/code/session_01PeoFMSiHywAAnfNcVtdGFH';
   const PENDING_KEY = 'grubguide.pending';
   const GH_KEY = 'grubguide.github';
-  const TRYVIEW_KEY = 'grubguide.tryview';
   const MAPFILTER_KEY = 'grubguide.mapfilter';
   const REPO = 'bhg0012/auburn-grub-guide';
   const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new';
@@ -56,7 +55,6 @@
     bolt: '<path d="M13.2 2.5 5 13.6h6.2L10.6 21.5 19 10.3h-6.3l.5-7.8Z"/>',
     glass: '<path d="M7.5 3.5h9l-.6 5.6a3.9 3.9 0 0 1-7.8 0L7.5 3.5ZM12 13v7.5M8.5 20.5h7"/>',
     locate: '<path d="M20 4 3.6 11.3l7.4 1.9 1.9 7.4L20 4Z"/>',
-    list: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.6" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>',
     store: '<path d="M4 9.5 5.6 4.5h12.8L20 9.5"/><path d="M4 9.5a2.65 2.65 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.65 2.65 0 0 0 5.3 0"/><path d="M5.5 12.2V20h13v-7.8"/><path d="M10 20v-4.6h4V20"/>',
     flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.9 3.2-6.3 4.4-10.3 2.6 1.7 3.7 4.3 3.4 6.6 1-.6 1.8-1.7 2.1-3 1.9 1.7 3.1 4.2 3.1 6.7 0 3.6-2.6 6.2-6.5 6.2Z"/>',
   };
@@ -172,7 +170,6 @@
     spinTier: 'any',
     spinPool: 'both',
     mapFilter: (() => { try { return ['tried', 'wish', 'all'].includes(localStorage.getItem(MAPFILTER_KEY)) ? localStorage.getItem(MAPFILTER_KEY) : 'tried'; } catch (_) { return 'tried'; } })(),
-    tryView: (() => { try { return localStorage.getItem(TRYVIEW_KEY) === 'map' ? 'map' : 'list'; } catch (_) { return 'list'; } })(),
   };
 
   function normalize(raw) {
@@ -716,14 +713,7 @@
     empty: () => (state.mapFilter === 'wish' ? 'Places you save will show up here' : state.places.length ? 'No spots with locations yet' : 'Spots you add will drop pins here'),
   });
 
-  const tryMap = makeMapView({
-    host: '#tryMapHost', screen: '#screen-trymap', preview: '#tryMapPreview', count: '#tryMapCount',
-    items: () => state.wish.filter((w) => state.tryFilter === 'all' || tierOf(w) === state.tryFilter),
-    order: byName,
-    empty: () => (state.wish.length ? 'Nothing here for this filter' : 'Places you save will show up here'),
-  });
-
-  const activeMap = () => (state.tab === 'map' ? mainMap : state.tab === 'try' && state.tryView === 'map' ? tryMap : null);
+  const activeMap = () => (state.tab === 'map' ? mainMap : null);
 
   /* ---------- Your location ---------- */
 
@@ -755,7 +745,6 @@
   function onPosition(p) {
     loc.pos = { lat: p.coords.latitude, lng: p.coords.longitude };
     mainMap.showMe();
-    tryMap.showMe();
     syncLocateButtons();
     if (loc.centerNext) { loc.centerNext = false; activeMap()?.centerOnMe(); }
     // Re-sort the To Try list by distance once you've moved a bit.
@@ -783,17 +772,14 @@
     navigator.permissions?.query({ name: 'geolocation' }).then((s) => { if (s.state === 'granted') startLocation(); }, () => {});
   }
 
-  /* ---------- To Try: list or map ---------- */
-
-  function setTryView(view) {
-    if (state.tryView === view) return;
-    haptic();
-    state.tryView = view;
-    try { localStorage.setItem(TRYVIEW_KEY, view); } catch (_) { /* private mode */ }
-    if (state.tab !== 'try') return;
-    $('#screen-try').classList.toggle('is-active', view === 'list');
-    $('#screen-trymap').classList.toggle('is-active', view === 'map');
-    if (view === 'map') tryMap.init().then(() => tryMap.map && tryMap.map.resize());
+  // "See them on a map" on the To Try tab: the Map tab, filtered to "Not yet".
+  function showWishMap() {
+    state.mapFilter = 'wish';
+    try { localStorage.setItem(MAPFILTER_KEY, 'wish'); } catch (_) { /* private mode */ }
+    syncMapFilter();
+    mainMap.select(null);
+    setTab('map');
+    if (mainMap.drawn) { mainMap.draw(); mainMap.fit(true, true); }
   }
 
   /* ---------- Tabs ---------- */
@@ -805,17 +791,14 @@
       const scr = $(`#screen-${tab}`);
       scr.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
       if (tab === 'map') { mainMap.select(null); mainMap.fit(); }
-      if (tab === 'try' && state.tryView === 'map') { tryMap.select(null); tryMap.fit(true, true); }
       return;
     }
     haptic();
     state.tab = tab;
-    const screenTab = tab === 'try' && state.tryView === 'map' ? 'trymap' : tab;
-    $$('.screen').forEach((s) => s.classList.toggle('is-active', s.dataset.tab === screenTab));
+    $$('.screen').forEach((s) => s.classList.toggle('is-active', s.dataset.tab === tab));
     $$('#tabbar button').forEach((b) => b.classList.toggle('is-active', b.dataset.tab === tab));
     $('#tabbar').style.setProperty('--i', TABS.indexOf(tab));
     if (tab === 'map') mainMap.init().then(() => mainMap.map && mainMap.map.resize());
-    if (screenTab === 'trymap') tryMap.init().then(() => tryMap.map && tryMap.map.resize());
     if (tab === 'stats') playStats();
   }
 
@@ -1116,7 +1099,7 @@
         <div><h3>Spin for somewhere new</h3><p>Quick bite or a sit-down dinner</p></div>
         ${icon('chev', 'chev')}
       </button>
-      <button class="try-mapbtn" data-tryview="map">
+      <button class="try-mapbtn" data-wishmap>
         <span class="try-mapbtn-icon">${icon('map')}</span>
         <span class="try-mapbtn-text"><b>See them on a map</b><small>${closest ? `Closest: ${esc(closest.name)}, ${fmtDist(near(closest))}` : 'Find something near you'}</small></span>
         ${icon('chev', 'chev')}
@@ -1142,7 +1125,6 @@
       </div>
       <p class="try-foot">Tried one? Open it and tap Rate it. It moves over to the Guide a few minutes later.</p>`;
     renderActivity();
-    syncTryMapFilter();
   }
 
   function syncMapFilter() {
@@ -1153,19 +1135,6 @@
     $$('button', seg).forEach((b, j) => {
       b.setAttribute('aria-selected', String(j === k));
       b.textContent = [`Eaten there ${state.places.length}`, `Not yet ${state.wish.length}`, `All ${state.places.length + state.wish.length}`][j];
-    });
-  }
-
-  function syncTryMapFilter() {
-    const seg = $('#tryMapFilter');
-    if (!seg) return;
-    const all = state.wish.length;
-    const quick = state.wish.filter((w) => tierOf(w) === 'quick').length;
-    const k = ['all', 'quick', 'sitdown'].indexOf(state.tryFilter);
-    seg.style.setProperty('--i', k);
-    $$('button', seg).forEach((b, j) => {
-      b.setAttribute('aria-selected', String(j === k));
-      b.textContent = [`All ${all}`, `Quick ${quick}`, `Sit-down ${all - quick}`][j];
     });
   }
 
@@ -1854,7 +1823,7 @@
         go(`#/${open.dataset.open}`);
         return;
       }
-      const segBtn = e.target.closest('#tryFilter button, #tryMapFilter button, #mapFilter button, #spinTier button, #spinPool button, #newTier button');
+      const segBtn = e.target.closest('#tryFilter button, #mapFilter button, #spinTier button, #spinPool button, #newTier button');
       if (segBtn) {
         const seg = segBtn.parentElement;
         const btns = $$('button', seg);
@@ -1864,7 +1833,7 @@
         seg.style.setProperty('--i', k);
         btns.forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
         const v = segBtn.dataset.v;
-        if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(() => { renderTry(); syncTryMapFilter(); }, 160); }
+        if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(renderTry, 160); }
         else if (seg.id === 'mapFilter') {
           state.mapFilter = v;
           try { localStorage.setItem(MAPFILTER_KEY, v); } catch (_) { /* private mode */ }
@@ -1872,7 +1841,6 @@
           mainMap.draw();
           syncMapFilter();
         }
-        else if (seg.id === 'tryMapFilter') { state.tryFilter = v; tryMap.select(null); tryMap.draw(); renderTry(); }
         else if (seg.id === 'newTier') { sheet.newTier = v; }
         else {
           if (seg.id === 'spinTier') state.spinTier = v; else state.spinPool = v;
@@ -1883,7 +1851,7 @@
         }
         return;
       }
-      if (e.target.closest('[data-tryview]')) { setTryView(e.target.closest('[data-tryview]').dataset.tryview); return; }
+      if (e.target.closest('[data-wishmap]')) { haptic(); showWishMap(); return; }
       const share = e.target.closest('[data-share]');
       if (share) { sharePlace(share.dataset.share); return; }
       if (e.target.closest('#spinBtn')) { doSpin(); return; }
@@ -1915,8 +1883,6 @@
     $('#btnAdd')?.addEventListener('click', () => go('#/add'));
     $('#btnPick')?.addEventListener('click', () => (state.places.length < 2 ? openPick() : go('#/pick')));
     $('#mapFit')?.addEventListener('click', () => { haptic(); mainMap.select(null); mainMap.fit(); });
-    $('#tryMapFit')?.addEventListener('click', () => { haptic(); tryMap.select(null); tryMap.fit(); });
-    $('#tryMapList')?.addEventListener('click', () => setTryView('list'));
     $$('.map-me').forEach((b) => b.addEventListener('click', () => { haptic(); startLocation({ center: true }); }));
     $('#sheetClose')?.addEventListener('click', closeSheet);
     $('#scrim')?.addEventListener('click', closeSheet);
@@ -1946,7 +1912,7 @@
     window.addEventListener('hashchange', applyRoute);
 
     darkQuery.addEventListener?.('change', () => {
-      [mainMap, tryMap].forEach((v) => v.map && v.map.setStyle(mapStyle()));
+      if (mainMap.map) mainMap.map.setStyle(mapStyle());
     });
 
     $$('.screen').forEach(bindNav);
@@ -1977,7 +1943,6 @@
     renderTry();
     renderStats();
     if (mainMap.map) mainMap.draw();
-    if (tryMap.map) tryMap.draw();
     if (!quiet) applyRoute();
   }
 
