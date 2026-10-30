@@ -1,0 +1,53 @@
+name: Requests from the app
+
+# The app opens an issue (marked grub-guide-request) when Bruce adds or rates a
+# spot. scripts/agent/run.mjs handles it: Claude Haiku for ratings of spots we
+# already have, Claude Sonnet for new places that need research. It commits to
+# main and closes the issue with the result, which the app is watching for.
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+
+# One at a time. The script works through every open request, so a run that
+# gets skipped here is picked up by the one already going.
+concurrency:
+  group: app-requests
+  cancel-in-progress: false
+
+jobs:
+  handle:
+    if: github.event_name == 'workflow_dispatch' || (github.event.issue.user.login == github.repository_owner && contains(github.event.issue.body, 'grub-guide-request'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: scripts/agent/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: |
+          npm ci --prefix scripts/agent --no-audit --no-fund
+          python -m pip install --quiet pillow
+
+      - name: Update the guide
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/agent/run.mjs
