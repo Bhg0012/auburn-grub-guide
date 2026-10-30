@@ -246,29 +246,6 @@
       "photoCredit": "Yelp reviewers"
     },
     {
-      "id": "culvers",
-      "name": "Culver's",
-      "category": "Burgers",
-      "tier": "quick",
-      "area": "E University Dr",
-      "added": "2026-10-25T12:00:00",
-      "blurb": "Midwest chain known for ButterBurgers, Wisconsin cheese curds and fresh frozen custard concretes.",
-      "address": "2080 E University Dr, Auburn, AL 36830",
-      "lat": 32.6266,
-      "lng": -85.4492,
-      "phone": "(334) 209-2708",
-      "website": "https://www.culvers.com/",
-      "hours": "Daily 10:30am-11pm",
-      "photos": [
-        "images/places/culvers/1.jpg",
-        "images/places/culvers/2.jpg",
-        "images/places/culvers/3.jpg",
-        "images/places/culvers/4.jpg",
-        "images/places/culvers/5.jpg"
-      ],
-      "photoCredit": "Yelp reviewers"
-    },
-    {
       "id": "moes-bbq",
       "name": "Moe's Original BBQ",
       "category": "BBQ",
