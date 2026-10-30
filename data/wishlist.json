@@ -470,6 +470,27 @@
         "images/places/byrons-smokehouse/5.jpg"
       ],
       "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "sheila-cs",
+      "name": "Sheila C's Burger Barn",
+      "category": "Burgers",
+      "tier": "quick",
+      "area": "Shug Jordan Pkwy",
+      "added": "2026-10-29T21:15:00",
+      "blurb": "Small, no-frills burger joint cooking fresh burgers on a flat-top grill, plus chicken tenders, hot dogs and grilled cheese. A perennial winner of the local Reader's Choice vote for best burger. Open Wednesday through Saturday only.",
+      "address": "622 Shug Jordan Pkwy, Auburn, AL 36832",
+      "lat": 32.594406,
+      "lng": -85.506561,
+      "phone": "(334) 283-5200",
+      "website": "https://www.facebook.com/pages/Sheila-Cs-Burger-Barn/849133661818783",
+      "hours": "Wed-Sat 10am-9pm, Sun-Tue closed",
+      "photos": [
+        "images/places/sheila-cs/1.jpg",
+        "images/places/sheila-cs/2.jpg",
+        "images/places/sheila-cs/3.jpg"
+      ],
+      "photoCredit": "Google and Tripadvisor reviewers via Wanderlog"
     }
   ]
 }
