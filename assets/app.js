@@ -7,6 +7,7 @@
   const CLAUDE_URL = 'https://claude.ai/code/session_01PeoFMSiHywAAnfNcVtdGFH';
   const PENDING_KEY = 'grubguide.pending';
   const GH_KEY = 'grubguide.github';
+  const TRYVIEW_KEY = 'grubguide.tryview';
   const REPO = 'bhg0012/auburn-grub-guide';
   const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
@@ -53,6 +54,8 @@
     bookmark: '<path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.3-6.5 4.3v-16a1 1 0 0 1 1-1Z"/>',
     bolt: '<path d="M13.2 2.5 5 13.6h6.2L10.6 21.5 19 10.3h-6.3l.5-7.8Z"/>',
     glass: '<path d="M7.5 3.5h9l-.6 5.6a3.9 3.9 0 0 1-7.8 0L7.5 3.5ZM12 13v7.5M8.5 20.5h7"/>',
+    locate: '<path d="M20 4 3.6 11.3l7.4 1.9 1.9 7.4L20 4Z"/>',
+    list: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.6" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>',
     flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.9 3.2-6.3 4.4-10.3 2.6 1.7 3.7 4.3 3.4 6.6 1-.6 1.8-1.7 2.1-3 1.9 1.7 3.1 4.2 3.1 6.7 0 3.6-2.6 6.2-6.5 6.2Z"/>',
   };
   const STAR = 'M12 2.9l2.75 5.6 6.15.9-4.45 4.35 1.05 6.1L12 16.95 6.5 19.85l1.05-6.1L3.1 9.4l6.15-.9L12 2.9Z';
@@ -166,6 +169,7 @@
     tryFilter: 'all',
     spinTier: 'any',
     spinPool: 'both',
+    tryView: (() => { try { return localStorage.getItem(TRYVIEW_KEY) === 'map' ? 'map' : 'list'; } catch (_) { return 'list'; } })(),
   };
 
   function normalize(raw) {
@@ -490,167 +494,302 @@
     el.className = 'pin';
     el.innerHTML = compact
       ? `<div class="pin-w" style="--n:${i}"><div class="pin-b">${p.wish ? `${icon('bookmark')}To try` : `${starSolid()}${fmtRating(p.rating)}`}</div></div>`
-      : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${photo(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div><div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div></div><span class="pin-more"></span></div></div>`;
+      : `<div class="pin-w" style="--n:${i}"><div class="pin-card">${p.photos.length ? photo(p) : mono(p)}<div class="pin-text"><div class="pin-name">${esc(p.name)}</div>${p.wish ? `<div class="pin-score pin-tier">${TIERS[tierOf(p)]}</div>` : `<div class="pin-score">${starSolid()}${fmtRating(p.rating)}</div>`}</div><span class="pin-more"></span></div></div>`;
+    if (p.wish && !compact) el.classList.add('pin-wish', tierOf(p));
     return el;
   }
 
-  /* ---------- Map tab ---------- */
+  /* ---------- Map views (Map tab and the To Try map) ---------- */
 
-  const mapState = { map: null, markers: new Map(), selected: null };
+  const byName = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
 
-  async function initMap() {
-    const gl = await loadMapLib().catch(() => null);
-    const host = $('#map');
-    if (!gl) {
-      if (!$('.map-empty', $('#screen-map'))) $('#screen-map').insertAdjacentHTML('beforeend', '<div class="map-empty glass">Map couldn’t load. Check your connection.</div>');
-      return;
-    }
-    if (!mapState.map) {
-      const map = new gl.Map({
-        container: host,
-        style: mapStyle(),
-        center: AUBURN,
-        zoom: 12.5,
-        attributionControl: false,
-        pitchWithRotate: false,
-        dragRotate: false,
-        fadeDuration: 150,
+  function makeMapView(cfg) {
+    const v = { map: null, markers: new Map(), selected: null, me: null, drawn: false };
+    const screen = () => $(cfg.screen);
+    const items = () => cfg.items().filter(hasCoords);
+
+    v.init = async () => {
+      const gl = await loadMapLib().catch(() => null);
+      if (!gl) {
+        if (!$('.map-empty', screen())) screen().insertAdjacentHTML('beforeend', '<div class="map-empty glass">Map couldn’t load. Check your connection.</div>');
+        return;
+      }
+      if (!v.map) {
+        const map = new gl.Map({
+          container: $(cfg.host),
+          style: mapStyle(),
+          center: AUBURN,
+          zoom: 12.5,
+          attributionControl: false,
+          pitchWithRotate: false,
+          dragRotate: false,
+          fadeDuration: 150,
+        });
+        map.touchZoomRotate.disableRotation();
+        map.addControl(new gl.AttributionControl({ compact: true }), 'bottom-left');
+        map.on('click', () => v.select(null));
+        let queued = false;
+        map.on('move', () => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => { queued = false; v.declutter(); });
+        });
+        v.map = map;
+      }
+      v.draw();
+      v.showMe();
+    };
+
+    v.draw = () => {
+      const gl = window.maplibregl;
+      const { map } = v;
+      if (!gl || !map) return;
+      v.markers.forEach((m) => m.remove());
+      v.markers.clear();
+      if (v.selected && !cfg.items().some((p) => p.id === v.selected)) v.select(null);
+      const pts = items().sort(cfg.order);
+      $(cfg.count).textContent = pts.length ? `${pts.length} ${pts.length === 1 ? 'spot' : 'spots'}` : '';
+      $('.map-empty', screen())?.remove();
+      if (!pts.length) {
+        screen().insertAdjacentHTML('beforeend', `<div class="map-empty glass">${cfg.empty()}</div>`);
+        return;
+      }
+      // add the lowest priority first so the best pins sit on top
+      pts.slice().reverse().forEach((p, i) => {
+        const el = pinEl(p, i);
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', p.wish ? `${p.name}, not tried yet` : `${p.name}, rated ${fmtRating(p.rating)} out of 10`);
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (el.cluster && el.cluster.length > 1 && map.getZoom() < 16.5) v.zoomTo(el.cluster);
+          else v.select(p.id);
+        });
+        const m = new gl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(map);
+        el.fullWidth = el.offsetWidth;
+        v.markers.set(p.id, m);
       });
-      map.touchZoomRotate.disableRotation();
-      map.addControl(new gl.AttributionControl({ compact: true }), 'bottom-left');
-      map.on('click', () => selectPin(null));
-      let queued = false;
-      map.on('move', () => {
-        if (queued) return;
-        queued = true;
-        requestAnimationFrame(() => { queued = false; declutter(); });
+      if (!v.drawn) v.fit(false, true);
+      v.drawn = true;
+      v.declutter();
+    };
+
+    /* Pins that would overlap fold into the top one nearby, which shows a "+N" badge. */
+    v.declutter = () => {
+      const { map } = v;
+      if (!map) return;
+      const order = items().filter((p) => v.markers.has(p.id)).sort(cfg.order);
+      if (v.selected) order.sort((a, b) => (b.id === v.selected) - (a.id === v.selected));
+      // Top spots get full cards; spots that would collide shrink to photo bubbles;
+      // only bubbles that would sit on top of each other fold into a "+N" badge.
+      const placed = [];
+      const hits = (b) => placed.find((o) => b.l < o.box.r && b.r > o.box.l && b.t < o.box.b && b.b > o.box.t);
+      order.forEach((p) => {
+        const el = v.markers.get(p.id).getElement();
+        const pt = map.project([p.lng, p.lat]);
+        const w = (el.fullWidth || 170) + 6;
+        const full = { l: pt.x - w / 2, r: pt.x + w / 2, t: pt.y - 56, b: pt.y };
+        const dot = { l: pt.x - 14, r: pt.x + 14, t: pt.y - 40, b: pt.y - 8 }; // bubbles may overlap a little
+        let mode = 'hidden';
+        let owner = null;
+        if (p.id === v.selected || !hits(full)) mode = 'full';
+        else if (!hits(dot)) mode = 'dot';
+        else owner = hits(dot);
+        el.classList.toggle('is-hidden', mode === 'hidden');
+        el.classList.toggle('is-compact', mode === 'dot');
+        if (owner) owner.members.push(p);
+        else placed.push({ box: mode === 'full' ? full : dot, el, members: [p] });
       });
-      mapState.map = map;
-    }
-    drawPins();
-  }
-
-  function drawPins() {
-    const gl = window.maplibregl;
-    const { map } = mapState;
-    if (!gl || !map) return;
-    mapState.markers.forEach((m) => m.remove());
-    mapState.markers.clear();
-    const pts = state.places.filter(hasCoords).sort(byTop);
-    $('#mapCount').textContent = pts.length ? `${pts.length} ${pts.length === 1 ? 'spot' : 'spots'}` : '';
-    $('.map-empty', $('#screen-map'))?.remove();
-    if (!pts.length) {
-      $('#screen-map').insertAdjacentHTML('beforeend', `<div class="map-empty glass">${state.places.length ? 'No spots with locations yet' : 'Spots you add will drop pins here'}</div>`);
-      return;
-    }
-    // add lowest rated first so the best pins sit on top
-    pts.slice().reverse().forEach((p, i) => {
-      const el = pinEl(p, i);
-      el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', `${p.name}, rated ${fmtRating(p.rating)} out of 10`);
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (el.cluster && el.cluster.length > 1 && map.getZoom() < 16.5) zoomToCluster(el.cluster);
-        else selectPin(p.id);
+      placed.forEach((g) => {
+        const n = g.members.length - 1;
+        g.el.cluster = g.members;
+        g.el.classList.toggle('has-more', n > 0);
+        const badge = $('.pin-more', g.el);
+        if (badge) badge.textContent = n > 0 ? `+${n}` : '';
       });
-      const m = new gl.Marker({ element: el, anchor: 'bottom' }).setLngLat([p.lng, p.lat]).addTo(map);
-      el.fullWidth = el.offsetWidth;
-      mapState.markers.set(p.id, m);
-    });
-    fitMap(false, true);
-    declutter();
+    };
+
+    v.zoomTo = (members) => {
+      const b = new window.maplibregl.LngLatBounds();
+      members.forEach((p) => b.extend([p.lng, p.lat]));
+      haptic();
+      v.map.fitBounds(b, { padding: { top: 150, bottom: 190, left: 90, right: 90 }, maxZoom: 17.5, duration: 800 });
+    };
+
+    // The opening view frames the densest cluster of spots (usually campus and downtown),
+    // or what's around you when your location is on. The scope button shows everything.
+    v.fit = (animate = true, core = false) => {
+      const gl = window.maplibregl;
+      let pts = items();
+      if (!gl || !v.map || !pts.length) return;
+      const duration = animate ? 900 : 0;
+      if (core && loc.pos && distKm(loc.pos, { lat: AUBURN[1], lng: AUBURN[0] }) < 40) {
+        const near = pts.slice().sort((a, b) => distKm(loc.pos, a) - distKm(loc.pos, b)).slice(0, 4);
+        const b = new gl.LngLatBounds([loc.pos.lng, loc.pos.lat], [loc.pos.lng, loc.pos.lat]);
+        near.forEach((p) => b.extend([p.lng, p.lat]));
+        v.map.fitBounds(b, { animate, duration, padding: { top: 140, bottom: 170, left: 80, right: 80 }, maxZoom: 15.5 });
+        return;
+      }
+      if (core && pts.length > 2) pts = corePlaces(pts);
+      const opts = core
+        ? { animate, duration, padding: { top: 120, bottom: 160, left: 75, right: 75 }, maxZoom: 16 }
+        : { animate, duration, padding: { top: 130, bottom: 170, left: 110, right: 110 }, maxZoom: 15 };
+      if (pts.length === 1) { v.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration }); return; }
+      const b = new gl.LngLatBounds();
+      pts.forEach((p) => b.extend([p.lng, p.lat]));
+      v.map.fitBounds(b, opts);
+    };
+
+    v.select = (id) => {
+      const prev = v.selected && v.markers.get(v.selected);
+      if (prev) prev.getElement().classList.remove('is-selected');
+      v.selected = id;
+      const preview = $(cfg.preview);
+      if (!id) { preview.classList.remove('is-shown'); v.declutter(); return; }
+      const m = v.markers.get(id);
+      const p = cfg.items().find((x) => x.id === id);
+      if (!p) return;
+      if (m) m.getElement().classList.add('is-selected');
+      v.declutter();
+      haptic();
+      const away = loc.pos ? `<span class="map-card-dist">${icon('go')}${fmtDist(distKm(loc.pos, p))} away</span>` : '';
+      preview.innerHTML = p.wish ? `
+        <a class="map-card" href="#/w/${esc(p.id)}">
+          ${p.photos.length ? photo(p) : mono(p)}
+          <div class="map-card-text">
+            <h3>${esc(p.name)}</h3>
+            <p>${[p.category, p.area].filter(Boolean).map(esc).join(' &middot; ')}</p>
+            <p class="map-card-sub">${tierText(p)}${away}</p>
+          </div>
+          ${icon('chev', 'chev')}
+        </a>` : `
+        <a class="map-card" href="#/p/${esc(p.id)}">
+          ${photo(p)}
+          <div class="map-card-text">
+            <h3>${esc(p.name)}</h3>
+            <p>${metaLine(p)}</p>
+            <p class="map-card-sub">${stars(p.rating)}${away}</p>
+          </div>
+          ${icon('chev', 'chev')}
+        </a>`;
+      preview.classList.add('is-shown');
+      v.map.easeTo({ center: [p.lng, p.lat], padding: { top: 0, bottom: 160, left: 0, right: 0 }, duration: 600 });
+    };
+
+    // The blue "you are here" dot.
+    v.showMe = () => {
+      const gl = window.maplibregl;
+      if (!gl || !v.map) return;
+      if (!loc.pos) { v.me?.remove(); v.me = null; return; }
+      if (!v.me) {
+        const el = document.createElement('div');
+        el.className = 'me';
+        el.innerHTML = '<span class="me-halo"></span><span class="me-dot"></span>';
+        el.setAttribute('aria-label', 'You are here');
+        v.me = new gl.Marker({ element: el, anchor: 'center' });
+      }
+      v.me.setLngLat([loc.pos.lng, loc.pos.lat]).addTo(v.map);
+    };
+
+    v.centerOnMe = () => {
+      if (!v.map || !loc.pos) return;
+      v.select(null);
+      v.map.flyTo({ center: [loc.pos.lng, loc.pos.lat], zoom: Math.max(v.map.getZoom(), 14.5), duration: 900 });
+    };
+
+    return v;
   }
 
-  /* Pins that would overlap fold into the best-rated one nearby, which shows a "+N" badge. */
-  function declutter() {
-    const { map } = mapState;
-    if (!map) return;
-    const order = state.places.filter((p) => hasCoords(p) && mapState.markers.has(p.id)).sort(byTop);
-    if (mapState.selected) order.sort((a, b) => (b.id === mapState.selected) - (a.id === mapState.selected));
-    // Best spots get full cards; spots that would collide shrink to photo bubbles;
-    // only bubbles that would sit on top of each other fold into a "+N" badge.
-    const placed = [];
-    const hits = (b) => placed.find((o) => b.l < o.box.r && b.r > o.box.l && b.t < o.box.b && b.b > o.box.t);
-    order.forEach((p) => {
-      const el = mapState.markers.get(p.id).getElement();
-      const pt = map.project([p.lng, p.lat]);
-      const w = (el.fullWidth || 170) + 6;
-      const full = { l: pt.x - w / 2, r: pt.x + w / 2, t: pt.y - 56, b: pt.y };
-      const dot = { l: pt.x - 14, r: pt.x + 14, t: pt.y - 40, b: pt.y - 8 }; // bubbles may overlap a little
-      const selected = p.id === mapState.selected;
-      let mode = 'hidden';
-      let owner = null;
-      if (selected || !hits(full)) mode = 'full';
-      else if (!hits(dot)) mode = 'dot';
-      else owner = hits(dot);
-      el.classList.toggle('is-hidden', mode === 'hidden');
-      el.classList.toggle('is-compact', mode === 'dot');
-      if (owner) owner.members.push(p);
-      else placed.push({ box: mode === 'full' ? full : dot, el, members: [p] });
-    });
-    placed.forEach((g) => {
-      const n = g.members.length - 1;
-      g.el.cluster = g.members;
-      g.el.classList.toggle('has-more', n > 0);
-      const badge = $('.pin-more', g.el);
-      if (badge) badge.textContent = n > 0 ? `+${n}` : '';
-    });
-  }
-
-  function zoomToCluster(members) {
-    const gl = window.maplibregl;
-    const b = new gl.LngLatBounds();
-    members.forEach((p) => b.extend([p.lng, p.lat]));
-    haptic();
-    mapState.map.fitBounds(b, { padding: { top: 150, bottom: 190, left: 90, right: 90 }, maxZoom: 17.5, duration: 800 });
-  }
-
-  // The opening view frames the densest cluster of spots (usually campus and downtown)
-  // so it isn't zoomed out too far to tell spots apart. The locate button shows everything.
   function corePlaces(pts) {
-    const km = (a, b) => Math.hypot((a.lat - b.lat) * 111, (a.lng - b.lng) * 111 * Math.cos((a.lat * Math.PI) / 180));
-    const near = (c) => pts.filter((p) => km(c, p) <= 1.6);
+    const near = (c) => pts.filter((p) => distKm(c, p) <= 1.6);
     const best = pts.map(near).sort((a, b) => b.length - a.length)[0];
     return best.length >= 3 ? best : pts;
   }
 
-  function fitMap(animate = true, core = false) {
-    const gl = window.maplibregl;
-    let pts = state.places.filter(hasCoords);
-    if (core && pts.length > 2) pts = corePlaces(pts);
-    if (!gl || !mapState.map || !pts.length) return;
-    const opts = core
-      ? { animate, duration: animate ? 900 : 0, padding: { top: 120, bottom: 160, left: 75, right: 75 }, maxZoom: 16 }
-      : { animate, duration: animate ? 900 : 0, padding: { top: 130, bottom: 170, left: 110, right: 110 }, maxZoom: 15 };
-    if (pts.length === 1) { mapState.map.easeTo({ center: [pts[0].lng, pts[0].lat], zoom: 15, duration: opts.duration }); return; }
-    const b = new gl.LngLatBounds();
-    pts.forEach((p) => b.extend([p.lng, p.lat]));
-    mapState.map.fitBounds(b, opts);
+  const mainMap = makeMapView({
+    host: '#map', screen: '#screen-map', preview: '#mapPreview', count: '#mapCount',
+    items: () => state.places,
+    order: byTop,
+    empty: () => (state.places.length ? 'No spots with locations yet' : 'Spots you add will drop pins here'),
+  });
+
+  const tryMap = makeMapView({
+    host: '#tryMapHost', screen: '#screen-trymap', preview: '#tryMapPreview', count: '#tryMapCount',
+    items: () => state.wish.filter((w) => state.tryFilter === 'all' || tierOf(w) === state.tryFilter),
+    order: byName,
+    empty: () => (state.wish.length ? 'Nothing here for this filter' : 'Places you save will show up here'),
+  });
+
+  const activeMap = () => (state.tab === 'map' ? mainMap : state.tab === 'try' && state.tryView === 'map' ? tryMap : null);
+
+  /* ---------- Your location ---------- */
+
+  const loc = { pos: null, watchId: null, centerNext: false, listAt: null };
+
+  function distKm(a, b) {
+    const r = Math.PI / 180;
+    const dLat = (b.lat - a.lat) * r;
+    const dLng = (b.lng - a.lng) * r;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(h));
+  }
+  function fmtDist(km) {
+    const mi = km * 0.621371;
+    return mi < 0.1 ? '0.1 mi' : mi < 10 ? `${mi.toFixed(1)} mi` : `${Math.round(mi)} mi`;
   }
 
-  function selectPin(id) {
-    const prev = mapState.selected && mapState.markers.get(mapState.selected);
-    if (prev) prev.getElement().classList.remove('is-selected');
-    mapState.selected = id;
-    const preview = $('#mapPreview');
-    if (!id) { preview.classList.remove('is-shown'); declutter(); return; }
-    const m = mapState.markers.get(id);
-    const p = state.byId.get(id);
-    if (m) m.getElement().classList.add('is-selected');
-    declutter();
+  function startLocation({ center = false } = {}) {
+    if (!navigator.geolocation) { toast('Location isn’t available here', 'x'); return; }
+    if (center) {
+      if (loc.pos) { activeMap()?.centerOnMe(); haptic(); }
+      else loc.centerNext = true;
+    }
+    if (loc.watchId != null) return;
+    loc.watchId = navigator.geolocation.watchPosition(onPosition, onPositionError, { enableHighAccuracy: true, maximumAge: 15000, timeout: 30000 });
+    syncLocateButtons();
+  }
+
+  function onPosition(p) {
+    loc.pos = { lat: p.coords.latitude, lng: p.coords.longitude };
+    mainMap.showMe();
+    tryMap.showMe();
+    syncLocateButtons();
+    if (loc.centerNext) { loc.centerNext = false; activeMap()?.centerOnMe(); }
+    // Re-sort the To Try list by distance once you've moved a bit.
+    if (!loc.listAt || distKm(loc.listAt, loc.pos) > 0.2) { loc.listAt = loc.pos; renderTry(); }
+  }
+
+  function onPositionError(err) {
+    if (err.code !== 1) return; // timeouts and weak signal: keep waiting
+    navigator.geolocation.clearWatch(loc.watchId);
+    loc.watchId = null;
+    loc.centerNext = false;
+    syncLocateButtons();
+    toast(isApple ? 'Allow location for Safari in Settings' : 'Location is turned off for this site', 'pin');
+  }
+
+  function syncLocateButtons() {
+    $$('.map-me').forEach((b) => {
+      b.classList.toggle('is-on', !!loc.pos);
+      b.classList.toggle('is-waiting', loc.watchId != null && !loc.pos);
+    });
+  }
+
+  // If location was allowed before, show the dot without asking again.
+  function resumeLocation() {
+    navigator.permissions?.query({ name: 'geolocation' }).then((s) => { if (s.state === 'granted') startLocation(); }, () => {});
+  }
+
+  /* ---------- To Try: list or map ---------- */
+
+  function setTryView(view) {
+    if (state.tryView === view) return;
     haptic();
-    preview.innerHTML = `
-      <a class="map-card" href="#/p/${esc(p.id)}">
-        ${photo(p)}
-        <div class="map-card-text">
-          <h3>${esc(p.name)}</h3>
-          <p>${metaLine(p)}</p>
-          ${stars(p.rating)}
-        </div>
-        ${icon('chev', 'chev')}
-      </a>`;
-    preview.classList.add('is-shown');
-    mapState.map.easeTo({ center: [p.lng, p.lat], padding: { top: 0, bottom: 160, left: 0, right: 0 }, duration: 600 });
+    state.tryView = view;
+    try { localStorage.setItem(TRYVIEW_KEY, view); } catch (_) { /* private mode */ }
+    if (state.tab !== 'try') return;
+    $('#screen-try').classList.toggle('is-active', view === 'list');
+    $('#screen-trymap').classList.toggle('is-active', view === 'map');
+    if (view === 'map') tryMap.init().then(() => tryMap.map && tryMap.map.resize());
   }
 
   /* ---------- Tabs ---------- */
@@ -661,17 +800,18 @@
     if (tab === state.tab) {
       const scr = $(`#screen-${tab}`);
       scr.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-      if (tab === 'map') { selectPin(null); fitMap(); }
+      if (tab === 'map') { mainMap.select(null); mainMap.fit(); }
+      if (tab === 'try' && state.tryView === 'map') { tryMap.select(null); tryMap.fit(true, true); }
       return;
     }
     haptic();
     state.tab = tab;
-    $$('.screen').forEach((s) => s.classList.toggle('is-active', s.dataset.tab === tab));
+    const screenTab = tab === 'try' && state.tryView === 'map' ? 'trymap' : tab;
+    $$('.screen').forEach((s) => s.classList.toggle('is-active', s.dataset.tab === screenTab));
     $$('#tabbar button').forEach((b) => b.classList.toggle('is-active', b.dataset.tab === tab));
     $('#tabbar').style.setProperty('--i', TABS.indexOf(tab));
-    if (tab === 'map') {
-      initMap().then(() => mapState.map && mapState.map.resize());
-    }
+    if (tab === 'map') mainMap.init().then(() => mainMap.map && mainMap.map.resize());
+    if (screenTab === 'trymap') tryMap.init().then(() => tryMap.map && tryMap.map.resize());
     if (tab === 'stats') playStats();
   }
 
@@ -955,14 +1095,21 @@
         </div>`;
       return;
     }
+    const near = loc.pos ? (w) => distKm(loc.pos, w) : null;
     const list = all
       .filter((w) => state.tryFilter === 'all' || tierOf(w) === state.tryFilter)
-      .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+      .sort(near ? (a, b) => (hasCoords(a) ? near(a) : 1e9) - (hasCoords(b) ? near(b) : 1e9) : byName);
     const idx = ['all', 'quick', 'sitdown'].indexOf(state.tryFilter);
+    const closest = near && list.find(hasCoords);
     el.innerHTML = `
       <button class="decide" data-open="pick" data-pool="new">
         ${icon('dice')}
         <div><h3>Spin for somewhere new</h3><p>Quick bite or a sit-down dinner</p></div>
+        ${icon('chev', 'chev')}
+      </button>
+      <button class="try-mapbtn" data-tryview="map">
+        <span class="try-mapbtn-icon">${icon('map')}</span>
+        <span class="try-mapbtn-text"><b>See them on a map</b><small>${closest ? `Closest: ${esc(closest.name)}, ${fmtDist(near(closest))}` : 'Find something near you'}</small></span>
         ${icon('chev', 'chev')}
       </button>
       <div class="segmented seg-wide" id="tryFilter" role="tablist" aria-label="Filter" style="--i:${idx}">
@@ -971,6 +1118,7 @@
         <button role="tab" data-v="quick" aria-selected="${idx === 1}">Quick ${quick}</button>
         <button role="tab" data-v="sitdown" aria-selected="${idx === 2}">Sit-down ${all.length - quick}</button>
       </div>
+      ${near ? `<p class="try-sort">${icon('go')}Closest to you first</p>` : ''}
       <div class="panel try-list">
         ${list.map((w, i) => `
           <a class="lrow" href="#/w/${esc(w.id)}" style="--n:${Math.min(i, 12)}">
@@ -979,11 +1127,26 @@
               <div class="lrow-title">${esc(w.name)}</div>
               <div class="lrow-sub">${pendingFor(w.id) ? `<span class="pending-text">Rating sent &middot; updating</span>` : `${tierText(w)} &middot; ${[w.category, w.area].filter(Boolean).map(esc).join(' &middot; ')}`}</div>
             </div>
+            ${near && hasCoords(w) ? `<span class="lrow-dist">${fmtDist(near(w))}</span>` : ''}
             ${icon('chev', 'chev')}
           </a>`).join('')}
       </div>
       <p class="try-foot">Tried one? Open it and tap Rate it. It moves over to the Guide a few minutes later.</p>`;
     renderActivity();
+    syncTryMapFilter();
+  }
+
+  function syncTryMapFilter() {
+    const seg = $('#tryMapFilter');
+    if (!seg) return;
+    const all = state.wish.length;
+    const quick = state.wish.filter((w) => tierOf(w) === 'quick').length;
+    const k = ['all', 'quick', 'sitdown'].indexOf(state.tryFilter);
+    seg.style.setProperty('--i', k);
+    $$('button', seg).forEach((b, j) => {
+      b.setAttribute('aria-selected', String(j === k));
+      b.textContent = [`All ${all}`, `Quick ${quick}`, `Sit-down ${all - quick}`][j];
+    });
   }
 
   function wishDirections(w) {
@@ -1671,7 +1834,7 @@
         go(`#/${open.dataset.open}`);
         return;
       }
-      const segBtn = e.target.closest('#tryFilter button, #spinTier button, #spinPool button, #newTier button');
+      const segBtn = e.target.closest('#tryFilter button, #tryMapFilter button, #spinTier button, #spinPool button, #newTier button');
       if (segBtn) {
         const seg = segBtn.parentElement;
         const btns = $$('button', seg);
@@ -1681,7 +1844,8 @@
         seg.style.setProperty('--i', k);
         btns.forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
         const v = segBtn.dataset.v;
-        if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(renderTry, 160); }
+        if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(() => { renderTry(); syncTryMapFilter(); }, 160); }
+        else if (seg.id === 'tryMapFilter') { state.tryFilter = v; tryMap.select(null); tryMap.draw(); renderTry(); }
         else if (seg.id === 'newTier') { sheet.newTier = v; }
         else {
           if (seg.id === 'spinTier') state.spinTier = v; else state.spinPool = v;
@@ -1692,6 +1856,7 @@
         }
         return;
       }
+      if (e.target.closest('[data-tryview]')) { setTryView(e.target.closest('[data-tryview]').dataset.tryview); return; }
       const share = e.target.closest('[data-share]');
       if (share) { sharePlace(share.dataset.share); return; }
       if (e.target.closest('#spinBtn')) { doSpin(); return; }
@@ -1722,7 +1887,10 @@
 
     $('#btnAdd').addEventListener('click', () => go('#/add'));
     $('#btnPick').addEventListener('click', () => (state.places.length < 2 ? openPick() : go('#/pick')));
-    $('#mapFit').addEventListener('click', () => { haptic(); selectPin(null); fitMap(); });
+    $('#mapFit').addEventListener('click', () => { haptic(); mainMap.select(null); mainMap.fit(); });
+    $('#tryMapFit').addEventListener('click', () => { haptic(); tryMap.select(null); tryMap.fit(); });
+    $('#tryMapList').addEventListener('click', () => setTryView('list'));
+    $$('.map-me').forEach((b) => b.addEventListener('click', () => { haptic(); startLocation({ center: true }); }));
     $('#sheetClose').addEventListener('click', closeSheet);
     $('#scrim').addEventListener('click', closeSheet);
     document.addEventListener('keydown', (e) => {
@@ -1751,7 +1919,7 @@
     window.addEventListener('hashchange', applyRoute);
 
     darkQuery.addEventListener?.('change', () => {
-      if (mapState.map) mapState.map.setStyle(mapStyle());
+      [mainMap, tryMap].forEach((v) => v.map && v.map.setStyle(mapStyle()));
     });
 
     $$('.screen').forEach(bindNav);
@@ -1781,7 +1949,8 @@
     renderGuide(!quiet);
     renderTry();
     renderStats();
-    if (mapState.map) drawPins();
+    if (mainMap.map) mainMap.draw();
+    if (tryMap.map) tryMap.draw();
     if (!quiet) applyRoute();
   }
 
@@ -1810,6 +1979,7 @@
     bind();
     load();
     watchPending();
+    resumeLocation();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
