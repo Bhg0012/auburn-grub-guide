@@ -756,6 +756,28 @@
         "images/places/waverly-local/3.jpg"
       ],
       "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "the-depot",
+      "name": "The Depot",
+      "category": "Seafood",
+      "tier": "sitdown",
+      "area": "Downtown",
+      "added": "2026-10-30T12:00:00",
+      "blurb": "A grilled Gulf-coastal brasserie in Auburn's historic train depot, serving fresh seafood with a globally inspired menu. Also known for pre-prohibition style cocktails, an award-winning wine list and craft beer. Reservations are recommended.",
+      "address": "124 Mitcham Ave, Auburn, AL 36830",
+      "lat": 32.6102094,
+      "lng": -85.4807659,
+      "phone": "(334) 521-5177",
+      "website": "https://www.allaboardauburn.com/",
+      "photos": [
+        "images/places/the-depot/1.jpg",
+        "images/places/the-depot/2.jpg",
+        "images/places/the-depot/3.jpg",
+        "images/places/the-depot/4.jpg",
+        "images/places/the-depot/5.jpg"
+      ],
+      "photoCredit": "The Depot"
     }
   ]
 }
