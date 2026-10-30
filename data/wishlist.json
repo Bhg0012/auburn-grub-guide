@@ -468,6 +468,294 @@
         "images/places/sheila-cs/3.jpg"
       ],
       "photoCredit": "Google and Tripadvisor reviewers via Wanderlog"
+    },
+    {
+      "id": "the-hound",
+      "name": "The Hound",
+      "category": "American",
+      "tier": "sitdown",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Rustic downtown restaurant and bar on Tichenor Ave with Southern-leaning food and a big bourbon list. Weekend brunch is the draw, and it's known for its bacon flight.",
+      "address": "124 Tichenor Ave, Auburn, AL 36830",
+      "lat": 32.607859,
+      "lng": -85.480935,
+      "phone": "(334) 246-3300",
+      "website": "http://www.thehound-auburn.com/",
+      "hours": "Mon closed, Tue-Fri 11am-2pm & 5pm-9pm, Sat-Sun 9:30am-2pm & 5pm-9pm",
+      "photos": [
+        "images/places/the-hound/1.jpg",
+        "images/places/the-hound/2.jpg",
+        "images/places/the-hound/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "little-italy",
+      "name": "Little Italy Pizzeria",
+      "category": "Pizza",
+      "tier": "quick",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "New York-style pizza by the slice or the whole pie on Magnolia, steps from Toomer's Corner. Open until 2am most nights and 3am on weekends.",
+      "address": "129 E Magnolia Ave, Auburn, AL 36830",
+      "lat": 32.606757,
+      "lng": -85.48098,
+      "phone": "(334) 821-6161",
+      "website": "http://littleitalyau.com/",
+      "hours": "Mon-Thu 11am-2am, Fri-Sat 11am-3am, Sun 11am-10pm",
+      "photos": [
+        "images/places/little-italy/1.jpg",
+        "images/places/little-italy/2.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "pho-lee",
+      "name": "Pho Lee",
+      "category": "Vietnamese",
+      "tier": "sitdown",
+      "area": "E Glenn Ave",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Family-owned Vietnamese restaurant known for pho, vermicelli bowls and banh mi. Closes between lunch and dinner, and closed Sundays.",
+      "address": "756 E Glenn Ave, Auburn, AL 36830",
+      "lat": 32.608416,
+      "lng": -85.466106,
+      "phone": "(334) 209-2979",
+      "website": "http://pholeeauburn.com/",
+      "hours": "Mon-Sat 11am-2:30pm & 4:30pm-9pm, Sun closed",
+      "photos": [
+        "images/places/pho-lee/1.jpg",
+        "images/places/pho-lee/2.jpg",
+        "images/places/pho-lee/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "pannie-georges",
+      "name": "Pannie-George's Kitchen",
+      "category": "Soul Food",
+      "tier": "quick",
+      "area": "South College",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Homestyle Southern soul food: fried chicken, mac and cheese, greens and cornbread. Mostly lunch hours, and closed Saturdays.",
+      "address": "2328 S College St Unit 6, Auburn, AL 36832",
+      "lat": 32.562237,
+      "lng": -85.505177,
+      "phone": "(334) 821-4142",
+      "website": "http://www.panniegeorgeskitchen.com/",
+      "hours": "Mon-Tue 11am-2pm, Wed-Fri 11am-7pm, Sat closed, Sun 10:30am-3pm",
+      "photos": [
+        "images/places/pannie-georges/1.jpg",
+        "images/places/pannie-georges/2.jpg",
+        "images/places/pannie-georges/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "big-blue-bagel",
+      "name": "Big Blue Bagel & Deli",
+      "category": "Bagels",
+      "tier": "quick",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Bagel shop and deli on College St right by Toomer's Corner, a cheap downtown breakfast and lunch staple. Closes at 2:30pm.",
+      "address": "120 N College St, Auburn, AL 36830",
+      "lat": 32.607176,
+      "lng": -85.48154,
+      "phone": "(334) 501-2245",
+      "website": "https://bigbluebagel.com/",
+      "hours": "Mon-Sat 7am-2:30pm, Sun 8am-2:30pm",
+      "photos": [
+        "images/places/big-blue-bagel/1.jpg",
+        "images/places/big-blue-bagel/2.jpg",
+        "images/places/big-blue-bagel/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "mrs-storys",
+      "name": "Mrs. Story's Dairy Bar",
+      "category": "Hot Dogs",
+      "tier": "quick",
+      "area": "Opelika",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Old-school walk-up dairy bar on Pepperell Pkwy, known for its chili dogs, burgers and ice cream.",
+      "address": "1900 Pepperell Pkwy, Opelika, AL 36801",
+      "lat": 32.638687,
+      "lng": -85.399908,
+      "phone": "(334) 749-1719",
+      "hours": "Mon-Sat 11am-8pm, Sun closed",
+      "photos": [
+        "images/places/mrs-storys/1.jpg",
+        "images/places/mrs-storys/2.jpg",
+        "images/places/mrs-storys/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "savanh-thai",
+      "name": "Savanh Thai Kitchen",
+      "category": "Thai",
+      "tier": "sitdown",
+      "area": "Opelika Rd",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Thai restaurant with a long traditional menu of curries, noodle dishes and hot pot soups. Closed Mondays and between lunch and dinner.",
+      "address": "1750 Opelika Rd Bldg B, Auburn, AL 36830",
+      "lat": 32.625267,
+      "lng": -85.44316,
+      "phone": "(334) 246-3088",
+      "website": "https://www.savanhthaikitchen.com/",
+      "hours": "Mon closed, Tue-Sun 11am-3pm & 5pm-9pm",
+      "photos": [
+        "images/places/savanh-thai/1.jpg",
+        "images/places/savanh-thai/2.jpg",
+        "images/places/savanh-thai/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "tacorita",
+      "name": "Tacorita",
+      "category": "Tacos",
+      "tier": "sitdown",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Taco tavern on College St mixing Mexican and American flavors, with creative tacos and margaritas.",
+      "address": "155 N College St, Auburn, AL 36830",
+      "lat": 32.608028,
+      "lng": -85.481915,
+      "website": "https://www.auburntacorita.com/",
+      "hours": "Mon-Thu 11am-9pm, Fri 11am-10pm, Sat 10am-10pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/tacorita/1.jpg",
+        "images/places/tacorita/2.jpg",
+        "images/places/tacorita/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "mellow-mushroom",
+      "name": "Mellow Mushroom",
+      "category": "Pizza",
+      "tier": "sitdown",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Downtown location of the Atlanta-born pizza chain, known for stone-baked pies, calzones and a funky, artsy dining room.",
+      "address": "128 N College St, Auburn, AL 36830",
+      "lat": 32.607369,
+      "lng": -85.481391,
+      "phone": "(334) 887-6356",
+      "website": "https://www.mellowmushroom.com/locations/al/auburn/128-n-college-st",
+      "hours": "Daily 11am-10pm",
+      "photos": [
+        "images/places/mellow-mushroom/1.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "venditoris",
+      "name": "Venditori's Italian Restaurant",
+      "category": "Italian",
+      "tier": "sitdown",
+      "area": "Bent Creek Rd",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Cozy family-style Italian restaurant near I-85 with pastas, pizzas and weekly deals. Dinner only.",
+      "address": "2575 Hilton Garden Dr, Auburn, AL 36830",
+      "lat": 32.604523,
+      "lng": -85.431273,
+      "phone": "(334) 826-7360",
+      "website": "http://www.venditoris-auburn.com/",
+      "hours": "Daily 4:30pm-9pm",
+      "photos": [
+        "images/places/venditoris/1.jpg",
+        "images/places/venditoris/2.jpg",
+        "images/places/venditoris/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "baumhowers",
+      "name": "Baumhower's Victory Grille",
+      "category": "Wings",
+      "tier": "sitdown",
+      "area": "Bent Creek Rd",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Sports grill from former Alabama and Miami Dolphins lineman Bob Baumhower, known for wings, burgers and coal-fired pizza.",
+      "address": "2353 Bent Creek Rd, Auburn, AL 36830",
+      "lat": 32.607072,
+      "lng": -85.428506,
+      "phone": "(334) 246-4180",
+      "website": "https://www.baumhowers.com/",
+      "hours": "Mon-Thu 11am-9pm, Fri-Sat 11am-10pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/baumhowers/1.jpg",
+        "images/places/baumhowers/2.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "shrimp-basket",
+      "name": "Shrimp Basket",
+      "category": "Seafood",
+      "tier": "sitdown",
+      "area": "South College",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Gulf Coast seafood chain with fried shrimp baskets, po'boys, crawfish and an oyster bar.",
+      "address": "1651 S College St, Auburn, AL 36832",
+      "lat": 32.575595,
+      "lng": -85.498143,
+      "phone": "(334) 539-8130",
+      "website": "https://shrimpbasket.com/location/auburn/",
+      "hours": "Daily 11am-9pm",
+      "photos": [
+        "images/places/shrimp-basket/1.jpg",
+        "images/places/shrimp-basket/2.jpg",
+        "images/places/shrimp-basket/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "amsterdam-cafe",
+      "name": "Amsterdam Cafe",
+      "category": "American",
+      "tier": "sitdown",
+      "area": "Downtown",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Longtime cozy spot on S Gay St serving Southern and international dishes, with a patio and live music.",
+      "address": "410 S Gay St, Auburn, AL 36830",
+      "lat": 32.598259,
+      "lng": -85.48032,
+      "phone": "(334) 826-8181",
+      "website": "https://amsterdamcafe.com/",
+      "hours": "Mon-Sat 11am-9pm, Sun 10am-9pm",
+      "photos": [
+        "images/places/amsterdam-cafe/1.jpg",
+        "images/places/amsterdam-cafe/2.jpg",
+        "images/places/amsterdam-cafe/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
+    },
+    {
+      "id": "waverly-local",
+      "name": "The Waverly Local",
+      "category": "Southern",
+      "tier": "sitdown",
+      "area": "Waverly",
+      "added": "2026-10-29T22:26:00",
+      "blurb": "Restaurant in a renovated old car lot in tiny Waverly, about 20 minutes north of Auburn, with upscale Southern food and live music. Dinner Tue-Sat plus weekend brunch.",
+      "address": "1465 Patrick St, Waverly, AL 36879",
+      "lat": 32.735005,
+      "lng": -85.576267,
+      "phone": "(334) 539-6077",
+      "website": "https://www.waverlylocal.com/",
+      "hours": "Mon closed, Tue-Thu 4:30pm-9pm, Fri 4:30pm-10pm, Sat 10am-2pm & 4:30pm-10pm, Sun 10am-2pm",
+      "photos": [
+        "images/places/waverly-local/1.jpg",
+        "images/places/waverly-local/2.jpg",
+        "images/places/waverly-local/3.jpg"
+      ],
+      "photoCredit": "Google reviewers via Wanderlog"
     }
   ]
 }
