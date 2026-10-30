@@ -57,6 +57,7 @@
     glass: '<path d="M7.5 3.5h9l-.6 5.6a3.9 3.9 0 0 1-7.8 0L7.5 3.5ZM12 13v7.5M8.5 20.5h7"/>',
     locate: '<path d="M20 4 3.6 11.3l7.4 1.9 1.9 7.4L20 4Z"/>',
     list: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.6" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>',
+    store: '<path d="M4 9.5 5.6 4.5h12.8L20 9.5"/><path d="M4 9.5a2.65 2.65 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.65 2.65 0 0 0 5.3 0"/><path d="M5.5 12.2V20h13v-7.8"/><path d="M10 20v-4.6h4V20"/>',
     flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.9 3.2-6.3 4.4-10.3 2.6 1.7 3.7 4.3 3.4 6.6 1-.6 1.8-1.7 2.1-3 1.9 1.7 3.1 4.2 3.1 6.7 0 3.6-2.6 6.2-6.5 6.2Z"/>',
   };
   const STAR = 'M12 2.9l2.75 5.6 6.15.9-4.45 4.35 1.05 6.1L12 16.95 6.5 19.85l1.05-6.1L3.1 9.4l6.15-.9L12 2.9Z';
@@ -477,7 +478,7 @@
         const css = document.createElement('link');
         css.rel = 'stylesheet';
         css.href = MAPLIBRE_CSS;
-        document.head.insertBefore(css, $('link[href="assets/styles.css"]'));
+        document.head.insertBefore(css, $('link[href^="assets/styles.css"]'));
         const s = document.createElement('script');
         s.src = MAPLIBRE_JS;
         s.onload = () => resolve(window.maplibregl);
@@ -959,6 +960,9 @@
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name}, ${dest}`)}`;
   }
 
+  // Google's business listing for the spot: reviews, photos, popular times.
+  const googleUrl = (p) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name, p.address || 'Auburn, AL'].join(', '))}`;
+
   const telHref = (phone) => `tel:${String(phone).replace(/[^\d+]/g, '')}`;
   const prettyUrl = (u) => String(u).replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 
@@ -969,6 +973,7 @@
       `<a class="action primary" href="${esc(directionsUrl(p))}" target="_blank" rel="noopener">${icon('go')}Directions</a>`,
       p.phone ? `<a class="action" href="${esc(telHref(p.phone))}">${icon('phone')}Call</a>` : '',
       p.website ? `<a class="action" href="${esc(p.website)}" target="_blank" rel="noopener">${icon('globe')}Website</a>` : '',
+      `<a class="action" href="${esc(googleUrl(p))}" target="_blank" rel="noopener">${icon('store')}Google</a>`,
       `<button class="action" data-share="${esc(p.id)}">${icon('share')}Share</button>`,
     ].filter(Boolean);
 
@@ -1142,6 +1147,7 @@
 
   function syncMapFilter() {
     const seg = $('#mapFilter');
+    if (!seg) return;
     const k = ['tried', 'wish', 'all'].indexOf(state.mapFilter);
     seg.style.setProperty('--i', k);
     $$('button', seg).forEach((b, j) => {
@@ -1906,14 +1912,14 @@
       if (tab) { setTab(tab.dataset.tab); }
     });
 
-    $('#btnAdd').addEventListener('click', () => go('#/add'));
-    $('#btnPick').addEventListener('click', () => (state.places.length < 2 ? openPick() : go('#/pick')));
-    $('#mapFit').addEventListener('click', () => { haptic(); mainMap.select(null); mainMap.fit(); });
-    $('#tryMapFit').addEventListener('click', () => { haptic(); tryMap.select(null); tryMap.fit(); });
-    $('#tryMapList').addEventListener('click', () => setTryView('list'));
+    $('#btnAdd')?.addEventListener('click', () => go('#/add'));
+    $('#btnPick')?.addEventListener('click', () => (state.places.length < 2 ? openPick() : go('#/pick')));
+    $('#mapFit')?.addEventListener('click', () => { haptic(); mainMap.select(null); mainMap.fit(); });
+    $('#tryMapFit')?.addEventListener('click', () => { haptic(); tryMap.select(null); tryMap.fit(); });
+    $('#tryMapList')?.addEventListener('click', () => setTryView('list'));
     $$('.map-me').forEach((b) => b.addEventListener('click', () => { haptic(); startLocation({ center: true }); }));
-    $('#sheetClose').addEventListener('click', closeSheet);
-    $('#scrim').addEventListener('click', closeSheet);
+    $('#sheetClose')?.addEventListener('click', closeSheet);
+    $('#scrim')?.addEventListener('click', closeSheet);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && sheet.kind) closeSheet();
       if (e.key === 'Enter' && e.target.id === 'ghToken') connectGitHub();

@@ -8,6 +8,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 - `data/wishlist.json`: the To Try list (places they want to go but haven't rated yet)
 - `scripts/process_photo.py`: resizes/compresses downloaded photos into `images/places/<id>/`
 - `scripts/validate.mjs`: sanity-checks `data/places.json` (also runs in CI)
+- `scripts/stamp.mjs`: after editing `assets/app.js` or `assets/styles.css`, run `node scripts/stamp.mjs` so `index.html` loads them as `?v=<hash>` (stops browsers mixing a new page with old cached code; `validate.mjs` errors if it's stale)
 - `.github/workflows/publish.yml`: merges any pushed `claude/*` branch into `main` automatically
 - `.github/workflows/app-requests.yml` + `scripts/agent/run.mjs`: turn requests sent from the app into commits (Haiku for ratings, Sonnet for new places)
 
@@ -99,4 +100,5 @@ Variants: `Add to our To Try list: <name>` (with Where/Type/Note lines) means re
 
 - Live site: https://bhg0012.github.io/auburn-grub-guide/ (GitHub Pages, source: `main` branch, root folder)
 - Maps use MapLibre GL + OpenFreeMap vector tiles (free, no key). Both maps come from `makeMapView()` in `app.js`. The location button shows a blue "you are here" dot (browser geolocation, asked on first tap; resumes silently when already allowed) and sorts the To Try list closest first with distances. CARTO raster tiles now require an API key, so don't switch back to them.
+- Every spot's action row has Directions, Call, Website (when known), Google (a Google Maps search for name + address, which opens their Google Business Profile listing) and Share.
 - Ratings are out of 10 (the user switched from 5; the first two spots were doubled: 4.1 -> 8.2, 4.3 -> 8.6). Stars display rating / 2. Verdict labels: 10 Perfect, 9+ Must-go, 8+ Great, 7+ Good, 6+ Solid, 4+ Meh, below that Skip it. A place's `verdict` field overrides this (Sushi Kingdom is 8.6 but the user called it a must-go). Must-go/Perfect get a highlighted badge and count toward the Must-gos stat.

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Checks data/places.json before it ships. Usage: node scripts/validate.mjs
 import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -71,6 +72,15 @@ for (const [i, w] of wish.entries()) {
 for (const [i, p] of places.entries()) {
   if (p.tier && !['quick', 'sitdown'].includes(p.tier)) errors.push(`places[${i}] (${p.name}): "tier" must be "quick" or "sitdown"`);
   if (!p.tier) warnings.push(`places[${i}] (${p.name}): no "tier" (quick or sitdown) for the spinner`);
+}
+
+// index.html must load the current app.js and styles.css (see scripts/stamp.mjs).
+{
+  const html = readFileSync(join(root, 'index.html'), 'utf8');
+  for (const f of ['assets/app.js', 'assets/styles.css']) {
+    const v = createHash('sha1').update(readFileSync(join(root, f))).digest('hex').slice(0, 10);
+    if (!html.includes(`${f}?v=${v}"`)) errors.push(`index.html loads a stale ${f}, run: node scripts/stamp.mjs`);
+  }
 }
 
 warnings.forEach((w) => console.warn(`warn  ${w}`));
