@@ -2178,5 +2178,5 @@ textarea.field { min-height: 120px; }
 .try-sort .ic { width: 12px; height: 12px; fill: currentColor; stroke-width: 1.5; }
 .lrow-dist { flex: none; font-size: 14px; color: var(--label-2); font-variant-numeric: tabular-nums; }
 @media (prefers-color-scheme: dark) { .try-sort { color: #0A84FF; } }
-#screen-trymap .map-btns { top: calc(var(--safe-t) + 108px); }
+.screen--map .map-btns { top: calc(var(--safe-t) + 108px); }
 #screen-trymap .map-preview { z-index: 600; }

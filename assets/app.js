@@ -8,6 +8,7 @@
   const PENDING_KEY = 'grubguide.pending';
   const GH_KEY = 'grubguide.github';
   const TRYVIEW_KEY = 'grubguide.tryview';
+  const MAPFILTER_KEY = 'grubguide.mapfilter';
   const REPO = 'bhg0012/auburn-grub-guide';
   const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
@@ -169,6 +170,7 @@
     tryFilter: 'all',
     spinTier: 'any',
     spinPool: 'both',
+    mapFilter: (() => { try { return ['tried', 'wish', 'all'].includes(localStorage.getItem(MAPFILTER_KEY)) ? localStorage.getItem(MAPFILTER_KEY) : 'tried'; } catch (_) { return 'tried'; } })(),
     tryView: (() => { try { return localStorage.getItem(TRYVIEW_KEY) === 'map' ? 'map' : 'list'; } catch (_) { return 'list'; } })(),
   };
 
@@ -556,7 +558,7 @@
       }
       // add the lowest priority first so the best pins sit on top
       pts.slice().reverse().forEach((p, i) => {
-        const el = pinEl(p, i);
+        const el = pinEl(p, Math.min(pts.length - 1 - i, 12)); // top pins drop in first
         el.setAttribute('role', 'button');
         el.setAttribute('aria-label', p.wish ? `${p.name}, not tried yet` : `${p.name}, rated ${fmtRating(p.rating)} out of 10`);
         el.addEventListener('click', (e) => {
@@ -707,9 +709,10 @@
 
   const mainMap = makeMapView({
     host: '#map', screen: '#screen-map', preview: '#mapPreview', count: '#mapCount',
-    items: () => state.places,
-    order: byTop,
-    empty: () => (state.places.length ? 'No spots with locations yet' : 'Spots you add will drop pins here'),
+    // "Eaten there" (rated), "Not yet" (To Try) or both. Rated spots get priority.
+    items: () => (state.mapFilter === 'tried' ? state.places : state.mapFilter === 'wish' ? state.wish : [...state.places, ...state.wish]),
+    order: (a, b) => (!!a.wish - !!b.wish) || (a.wish ? byName(a, b) : byTop(a, b)),
+    empty: () => (state.mapFilter === 'wish' ? 'Places you save will show up here' : state.places.length ? 'No spots with locations yet' : 'Spots you add will drop pins here'),
   });
 
   const tryMap = makeMapView({
@@ -1082,6 +1085,7 @@
   /* ---------- To Try ---------- */
 
   function renderTry() {
+    syncMapFilter();
     const el = $('#tryBody');
     const all = state.wish;
     const quick = all.filter((w) => tierOf(w) === 'quick').length;
@@ -1134,6 +1138,16 @@
       <p class="try-foot">Tried one? Open it and tap Rate it. It moves over to the Guide a few minutes later.</p>`;
     renderActivity();
     syncTryMapFilter();
+  }
+
+  function syncMapFilter() {
+    const seg = $('#mapFilter');
+    const k = ['tried', 'wish', 'all'].indexOf(state.mapFilter);
+    seg.style.setProperty('--i', k);
+    $$('button', seg).forEach((b, j) => {
+      b.setAttribute('aria-selected', String(j === k));
+      b.textContent = [`Eaten there ${state.places.length}`, `Not yet ${state.wish.length}`, `All ${state.places.length + state.wish.length}`][j];
+    });
   }
 
   function syncTryMapFilter() {
@@ -1834,7 +1848,7 @@
         go(`#/${open.dataset.open}`);
         return;
       }
-      const segBtn = e.target.closest('#tryFilter button, #tryMapFilter button, #spinTier button, #spinPool button, #newTier button');
+      const segBtn = e.target.closest('#tryFilter button, #tryMapFilter button, #mapFilter button, #spinTier button, #spinPool button, #newTier button');
       if (segBtn) {
         const seg = segBtn.parentElement;
         const btns = $$('button', seg);
@@ -1845,6 +1859,13 @@
         btns.forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
         const v = segBtn.dataset.v;
         if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(() => { renderTry(); syncTryMapFilter(); }, 160); }
+        else if (seg.id === 'mapFilter') {
+          state.mapFilter = v;
+          try { localStorage.setItem(MAPFILTER_KEY, v); } catch (_) { /* private mode */ }
+          mainMap.select(null);
+          mainMap.draw();
+          syncMapFilter();
+        }
         else if (seg.id === 'tryMapFilter') { state.tryFilter = v; tryMap.select(null); tryMap.draw(); renderTry(); }
         else if (seg.id === 'newTier') { sheet.newTier = v; }
         else {
