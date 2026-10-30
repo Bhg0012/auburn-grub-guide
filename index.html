@@ -33,7 +33,7 @@
         <div class="nav-title">Auburn Grub Guide</div>
         <div class="nav-actions">
           <button class="glass-btn" id="btnPick" aria-label="Pick a spot for us"><svg class="ic" data-icon="dice"></svg></button>
-          <button class="glass-btn" id="btnAdd" aria-label="How to add a spot"><svg class="ic" data-icon="plus"></svg></button>
+          <button class="glass-btn" id="btnAdd" aria-label="Add a spot"><svg class="ic" data-icon="plus"></svg></button>
         </div>
       </header>
       <div class="content">
@@ -41,6 +41,7 @@
           <p class="eyebrow" id="guideEyebrow">Auburn, Alabama</p>
           <h1>Auburn Grub Guide</h1>
         </div>
+        <div id="activity"></div>
         <label class="search">
           <svg class="ic" data-icon="search"></svg>
           <input id="search" type="search" placeholder="Search spots, food, notes" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
@@ -76,12 +77,16 @@
     <section class="screen" id="screen-try" data-tab="try" aria-label="To Try">
       <header class="nav">
         <div class="nav-title">To Try</div>
+        <div class="nav-actions">
+          <button class="glass-btn" data-open="new" aria-label="Add a place"><svg class="ic" data-icon="plus"></svg></button>
+        </div>
       </header>
       <div class="content">
         <div class="large-title">
           <p class="eyebrow" id="tryEyebrow">Still on the list</p>
           <h1>To Try</h1>
         </div>
+        <div id="tryActivity"></div>
         <div id="tryBody"></div>
       </div>
     </section>

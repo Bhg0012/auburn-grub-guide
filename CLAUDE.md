@@ -9,6 +9,7 @@ A mobile-first web app that tracks the local food spots Bruce and friends have t
 - `scripts/process_photo.py`: resizes/compresses downloaded photos into `images/places/<id>/`
 - `scripts/validate.mjs`: sanity-checks `data/places.json` (also runs in CI)
 - `.github/workflows/publish.yml`: merges any pushed `claude/*` branch into `main` automatically
+- `.github/workflows/app-requests.yml` + `scripts/agent/run.mjs`: turn requests sent from the app into commits (Haiku for ratings, Sonnet for new places)
 
 ## Standing instructions from the user
 
@@ -72,9 +73,16 @@ Adding to the list: research each place exactly like a rated spot (MapQuest page
 
 Editing or removing a spot works the same way: change `data/places.json` (and photos), validate, commit, push both.
 
-## Rating from the app
+## Sending from the app
 
-Every To Try spot has a **Rate it** button, and the + sheet has **Rate a new spot**. The form (rating slider, comments one per line, optional dish, Must-go switch) copies a message like this for the user to paste into the Claude chat:
+The + sheet has **Add a place** (name, optional where/type/note, and an "Already been?" switch that is off by default, so it saves to To Try; switched on it shows the rating form) and **Rate a place we tried**. Every To Try spot has **Rate it**, and every rated spot has **Update our rating** (prefilled form).
+
+**Direct send (when the phone is connected):** the app stores a fine-grained GitHub token (Issues read/write, this repo only) in localStorage (`#/connect`) and opens an issue whose body has `<!-- grub-guide-request -->` and a JSON block `{type, id, name, rating, mustGo, order, comments, tier, where, note}`. `.github/workflows/app-requests.yml` runs `scripts/agent/run.mjs` on issues the repo owner opens. It handles every open request oldest first:
+- `rate` (To Try spot) and `rerate` (rated spot): done in code, plus one **Claude Haiku** (`claude-haiku-5-5`) call to tidy comments and pick tags/price. Under a cent.
+- `add` (to To Try) and `ratenew` (new place, rated): **Claude Sonnet** (`claude-sonnet-5-5`) through the Claude Agent SDK, following this file, capped at $2 and 80 turns. Usually 20-60 cents.
+Then it validates, commits to `main` with the GitHub token, asks Pages to rebuild, comments the result (with a `<!-- grub-guide-result {...} -->` tag the app reads) and closes the issue (`not_planned` when it failed). Needs the repo secret `ANTHROPIC_API_KEY` (from the Console org linked to the user's Max plan API credits). The app polls the issue every 20 seconds and shows progress cards on the Guide and To Try tabs.
+
+**Copy and paste (not connected, or GitHub refused):** the form copies a message like this for the user to paste into the Claude chat:
 
 ```
 Add to the Grub Guide: Bow & Arrow
@@ -85,7 +93,7 @@ Order this: Brisket tacos
 (It's on our To Try list as "bow-and-arrow".)
 ```
 
-Treat it like any other rating: move the spot from the To Try list (or research it if it says "New place"), set `verdict: "Must-go"` only when "(Must-go)" is there, and `mustTry` only from "Order this". The app remembers sent ratings in localStorage, shows "Rating sent · updating" and re-checks the data every 45 seconds until the place appears in `places.json`. (A GitHub Action version was built and removed because it needs a paid API key or subscription token; the user chose copy and paste.)
+Variants: `Add to our To Try list: <name>` (with Where/Type/Note lines) means research it onto the To Try list; `Update our rating in the Grub Guide: <name>` means change that rated spot's rating/comments/mustTry/verdict. Treat them like any other request: move the spot from the To Try list (or research it if it says "New place"), set `verdict: "Must-go"` only when "(Must-go)" is there, and `mustTry` only from "Order this".
 
 ## Notes
 

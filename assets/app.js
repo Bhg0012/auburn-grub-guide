@@ -6,6 +6,9 @@
   const WISH_URL = 'data/wishlist.json';
   const CLAUDE_URL = 'https://claude.ai/code/session_01PeoFMSiHywAAnfNcVtdGFH';
   const PENDING_KEY = 'grubguide.pending';
+  const GH_KEY = 'grubguide.github';
+  const REPO = 'bhg0012/auburn-grub-guide';
+  const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new';
   const AUBURN = [-85.4808, 32.6099]; // [lng, lat]
   const MAPLIBRE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js';
   const MAPLIBRE_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css';
@@ -898,7 +901,9 @@
           ${rows ? `<div class="group" ${hasCoords(p) ? '' : ''}>${rows}</div>` : ''}
         </section>` : ''}
 
-        ${wish ? '<p class="try-foot" style="margin-top:22px">Been here? Tap Rate it and it moves over to the Guide.</p>' : ''}
+        ${wish ? '<p class="try-foot" style="margin-top:22px">Been here? Tap Rate it and it moves over to the Guide.</p>'
+          : pendingFor(p.id) ? `<p class="rerate-sent">${icon('check')}Update sent</p>`
+          : `<a class="btn btn-tinted btn-block rerate-btn" href="#/rate/${esc(p.id)}">${icon('star')}Update our rating</a>`}
         ${p.photoCredit ? `<p class="credit">Photos: ${esc(p.photoCredit)}</p>` : ''}
       </div>`;
   }
@@ -946,7 +951,7 @@
         <div class="empty">
           <div class="empty-art">${icon('bookmark')}</div>
           <h3>Nothing left to try</h3>
-          <p>Tell Claude about places you want to go and they'll show up here.</p>
+          <p>Tap + to save places you want to go. They show up here.</p>
         </div>`;
       return;
     }
@@ -978,6 +983,7 @@
           </a>`).join('')}
       </div>
       <p class="try-foot">Tried one? Open it and tap Rate it. It moves over to the Guide a few minutes later.</p>`;
+    renderActivity();
   }
 
   function wishDirections(w) {
@@ -1006,66 +1012,211 @@
       </div>`, { plain: true });
   }
 
+  /* ---------- Direct send (GitHub) ---------- */
+
+  // A fine-grained GitHub token (Issues: read and write, this repo only) lives in
+  // localStorage. Requests become issues; .github/workflows/app-requests.yml has
+  // Claude Haiku or Claude Sonnet update the guide and close the issue.
+  const ghToken = () => { try { return localStorage.getItem(GH_KEY) || ''; } catch (_) { return ''; } };
+  const setGhToken = (t) => { try { t ? localStorage.setItem(GH_KEY, t) : localStorage.removeItem(GH_KEY); } catch (_) { /* private mode */ } };
+
+  async function ghApi(path, { method = 'GET', body, token = ghToken() } = {}) {
+    const res = await fetch(`https://api.github.com${path}`, {
+      method,
+      cache: 'no-store',
+      headers: {
+        authorization: `Bearer ${token}`,
+        accept: 'application/vnd.github+json',
+        ...(body ? { 'content-type': 'application/json' } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw Object.assign(new Error(`GitHub ${res.status}`), { status: res.status });
+    return res.json();
+  }
+
+  const MODEL = { rate: 'Claude Haiku', rerate: 'Claude Haiku', add: 'Claude Sonnet', ratenew: 'Claude Sonnet' };
+  const ETA = { rate: 'about 2 min', rerate: 'about 2 min', add: 'about 5 min', ratenew: 'about 5 min' };
+
+  function openConnect() {
+    const on = !!ghToken();
+    openSheet('connect', on ? `
+      <div class="rate rate-done">
+        <div class="compact-icon">${icon('bolt')}</div>
+        <h1 class="rate-title">Direct send is on</h1>
+        <p class="rate-done-text">Ratings and new places go straight to GitHub. Claude Haiku handles ratings, Claude Sonnet looks up new places, and the guide updates on its own.</p>
+        <button class="btn btn-primary btn-block" id="rateDone">Done</button>
+        <button class="btn btn-plain btn-block" id="ghDisconnect">Disconnect this phone</button>
+      </div>` : `
+      <div class="rate connect">
+        <div class="compact-icon">${icon('bolt')}</div>
+        <h1 class="rate-title">Direct send</h1>
+        <p class="connect-text">Send ratings and new places straight from the app, no copying and pasting. Claude Haiku handles ratings and Claude Sonnet looks up new places.</p>
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span><p>Open <a href="${TOKEN_URL}" target="_blank" rel="noopener">GitHub token settings</a> and make a fine-grained token. <span>Name it Grub Guide, any expiration.</span></p></div>
+          <div class="step"><span class="step-n">2</span><p>Repository access: <b>Only select repositories</b>, then pick auburn-grub-guide.</p></div>
+          <div class="step"><span class="step-n">3</span><p>Permissions: <b>Issues</b>, Read and write. <span>Nothing else.</span></p></div>
+          <div class="step"><span class="step-n">4</span><p>Generate it, copy it and paste it here.</p></div>
+        </div>
+        <input class="field" id="ghToken" type="password" placeholder="github_pat_..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+        <button class="btn btn-primary btn-block connect-btn" id="ghConnect">Connect</button>
+        <p class="try-foot">The token only lives on this phone. Safari and the home screen app keep separate copies, so connect in the one you use.</p>
+      </div>`, { plain: true });
+  }
+
+  async function connectGitHub() {
+    const input = $('#ghToken');
+    const btn = $('#ghConnect');
+    const token = (input?.value || '').trim();
+    if (!token) { toast('Paste the token first', 'x'); input?.focus(); return; }
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    try {
+      await ghApi(`/repos/${REPO}`, { token });
+      setGhToken(token);
+      haptic(14);
+      toast('Direct send is on');
+      openConnect();
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Connect';
+      toast(err.status === 401 ? 'GitHub didn’t accept that token' : err.status === 404 ? 'That token can’t see the repo' : 'Couldn’t reach GitHub', 'x');
+    }
+  }
+
   /* ---------- Add sheet ---------- */
 
   function openAdd() {
+    const on = !!ghToken();
     openSheet('add', `
       <div class="compact-body">
         <div class="compact-icon">${icon('sparkle')}</div>
         <h2>Add a spot</h2>
-        <p>Fill out a quick review, then paste it to Claude. Claude finds the photos, address and details, and the guide updates in a few minutes.</p>
-        <a class="btn btn-primary btn-block add-rate" href="#/rate/new">${icon('star')}Rate a new spot</a>
-        <a class="btn btn-tinted btn-block add-chat" href="${CLAUDE_URL}" target="_blank" rel="noopener">${icon('bubble')}Open Claude chat</a>
+        <p>Save a place to try later, or rate one you just went to. Claude finds the photos, address and hours.</p>
+        <a class="btn btn-primary btn-block add-rate" href="#/new" data-replace>${icon('bookmark')}Add a place</a>
+        <a class="btn btn-tinted btn-block add-chat" href="#/new/rate" data-replace>${icon('star')}Rate a place we tried</a>
+        <a class="add-direct ${on ? 'on' : ''}" href="#/connect" data-replace>${icon(on ? 'bolt' : 'bubble')}<span>${on ? 'Direct send is on' : 'Using the Claude chat. Set up direct send'}</span>${icon('chev', 'chev')}</a>
       </div>`, { compact: true });
   }
 
-  /* ---------- Rate it (copies a review to paste into the Claude chat) ---------- */
+  /* ---------- Pending requests ---------- */
 
   function readPending() {
-    try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (_) { return []; }
+    try {
+      return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]').map((x) => ({ type: 'rate', status: 'copied', key: `rate:${x.id}`, ...x }));
+    } catch (_) { return []; }
   }
   function writePending(list) {
     try { localStorage.setItem(PENDING_KEY, JSON.stringify(list)); } catch (_) { /* private mode */ }
   }
-  const pendingFor = (id) => readPending().find((x) => x.id === id);
+  function addPending(item) {
+    writePending([...readPending().filter((x) => x.key !== item.key), item]);
+    renderActivity();
+  }
+  function updatePending(key, patch) {
+    writePending(readPending().map((x) => (x.key === key ? { ...x, ...patch } : x)));
+  }
+  const pendingFor = (id) => readPending().find((x) => x.id === id && x.status !== 'failed');
   const normName = (n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  // Drop pending reviews that have landed (or are over 2 hours old) and say so.
-  function settlePending() {
-    const rated = new Set(state.places.map((p) => normName(p.name)));
-    const keep = [];
-    readPending().forEach((x) => {
-      if (rated.has(normName(x.name))) toast(`${x.name} is in the guide`, 'check');
-      else if (Date.now() - x.ts < 2 * 3600e3) keep.push(x);
-    });
-    writePending(keep);
+  // Has the update shown up in the data yet?
+  function landed(x) {
+    if (x.type === 'add') return x.doneId ? state.wishById.has(x.doneId) : state.wish.some((w) => normName(w.name) === normName(x.name));
+    if (x.type === 'rerate') {
+      const p = state.byId.get(x.id);
+      return !!p && Math.abs(p.rating - x.rating) < 0.05 && (x.status === 'published' || x.rating !== x.was);
+    }
+    if (x.doneId) return state.byId.has(x.doneId);
+    if (x.id && state.wishById.has(x.id)) return false;
+    return state.places.some((p) => normName(p.name) === normName(x.name));
   }
 
-  function openRate(id) {
-    const w = id && id !== 'new' ? state.wishById.get(id) : null;
-    openSheet('rate', `
-      <div class="rate">
-        ${w ? `<div class="rate-head">${w.photos.length ? photo(w, 0, true) : mono(w)}<div><p class="eyebrow">Rate it</p><h1 class="rate-title">${esc(w.name)}</h1></div></div>`
-            : `<p class="eyebrow">Rate it</p><h1 class="rate-title">New spot</h1>
-               <input class="field" id="rateName" placeholder="Restaurant name" autocomplete="off" autocapitalize="words" enterkeyhint="next">`}
-        <div class="rate-card">
-          <div class="rate-score"><span class="rate-num" id="rateNum">7.5</span><small>/10</small></div>
-          <div class="rate-sub"><span id="rateStars">${stars(7.5)}</span><span class="rate-verdict" id="rateVerdict">${verdict(7.5)}</span></div>
-          <div class="rate-slider">
-            <button type="button" class="rate-step" data-step="-0.1" aria-label="Lower">${icon('minus')}</button>
-            <input type="range" id="rateRange" min="0" max="10" step="0.1" value="7.5" aria-label="Rating out of 10">
-            <button type="button" class="rate-step" data-step="0.1" aria-label="Higher">${icon('plus')}</button>
-          </div>
+  function settlePending() {
+    const keep = [];
+    readPending().forEach((x) => {
+      if (x.status !== 'failed' && landed(x)) {
+        toast(x.type === 'add' ? `${x.name} is on the To Try list` : x.type === 'rerate' ? `${x.name} is updated` : `${x.name} is in the guide`, 'check');
+        return;
+      }
+      if (x.status === 'published' && Date.now() - x.doneAt > 15 * 60e3) return;
+      if (x.status === 'copied' && Date.now() - x.ts > 2 * 3600e3) return;
+      if (x.status === 'working' && Date.now() - x.ts > 3 * 3600e3) { keep.push({ ...x, status: 'failed', msg: 'No word back from GitHub.' }); return; }
+      keep.push(x);
+    });
+    writePending(keep);
+    renderActivity();
+  }
+
+  // Check the GitHub issue behind each request that's still being worked on.
+  async function pollIssues() {
+    const list = readPending().filter((x) => x.issue && x.status === 'working');
+    if (!list.length || !ghToken()) return;
+    await Promise.all(list.map(async (x) => {
+      try {
+        const issue = await ghApi(`/repos/${REPO}/issues/${x.issue}`);
+        if (issue.state !== 'closed') return;
+        const comments = await ghApi(`/repos/${REPO}/issues/${x.issue}/comments?per_page=100`);
+        let result = null;
+        comments.forEach((c) => {
+          const m = /<!-- grub-guide-result (\{.*?\}) -->/.exec(c.body || '');
+          if (m) { try { result = JSON.parse(m[1]); } catch (_) { /* ignore */ } }
+        });
+        const ok = result ? result.ok : issue.state_reason === 'completed';
+        if (ok) {
+          updatePending(x.key, { status: 'published', doneAt: Date.now(), doneId: result?.id || x.id });
+        } else {
+          updatePending(x.key, { status: 'failed', msg: result?.message || 'It was closed on GitHub without an update.' });
+          toast(`${x.name} didn’t go through`, 'x');
+        }
+      } catch (_) { /* offline or rate limited, try again next time */ }
+    }));
+  }
+
+  function activityItem(x) {
+    const verb = { add: 'Adding', ratenew: 'Adding', rate: 'Rating', rerate: 'Updating' }[x.type] || 'Adding';
+    if (x.status === 'failed') return { cls: 'is-failed', ic: 'x', title: `${x.name} didn’t go through`, sub: x.msg || 'Try sending it again.' };
+    if (x.status === 'published') return { cls: 'is-done', ic: 'check', title: `${verb} ${x.name}`, sub: 'Done. Showing up in a minute' };
+    if (x.status === 'copied') return { cls: 'is-waiting', ic: 'bubble', title: `${verb} ${x.name}`, sub: 'Waiting on the Claude chat' };
+    const late = Date.now() - x.ts > 20 * 60e3;
+    const doing = x.type === 'add' || x.type === 'ratenew' ? `${MODEL[x.type]} is looking it up` : `${MODEL[x.type]} is on it`;
+    return { cls: 'is-working', title: `${verb} ${x.name}`, sub: late ? 'Taking longer than usual' : `${doing} · ${ETA[x.type]}` };
+  }
+
+  function renderActivity() {
+    const list = readPending();
+    const html = list.length ? `<div class="activity">${list.map((x) => {
+      const a = activityItem(x);
+      return `
+        <div class="act ${a.cls}">
+          <div class="act-icon">${a.ic ? icon(a.ic) : '<span class="spinner"></span>'}</div>
+          <div class="act-text"><b>${esc(a.title)}</b><span>${esc(a.sub)}</span></div>
+          ${a.cls === 'is-failed' || a.cls === 'is-waiting' ? `<button class="act-x" data-dismiss="${esc(x.key)}" aria-label="Dismiss">${icon('x')}</button>` : ''}
+        </div>`;
+    }).join('')}</div>` : '';
+    ['#activity', '#tryActivity'].forEach((s) => { const el = $(s); if (el && el.innerHTML !== html) el.innerHTML = html; });
+  }
+
+  /* ---------- Forms: rate a spot, update a rating, add a place ---------- */
+
+  function rateFieldsHtml({ rating = 7.5, comments = '', order = '', must = false } = {}) {
+    return `
+      <div class="rate-card">
+        <div class="rate-score"><span class="rate-num" id="rateNum">${rating.toFixed(1)}</span><small>/10</small></div>
+        <div class="rate-sub"><span id="rateStars">${stars(rating)}</span><span class="rate-verdict" id="rateVerdict">${verdict(rating)}</span></div>
+        <div class="rate-slider">
+          <button type="button" class="rate-step" data-step="-0.1" aria-label="Lower">${icon('minus')}</button>
+          <input type="range" id="rateRange" min="0" max="10" step="0.1" value="${rating}" aria-label="Rating out of 10">
+          <button type="button" class="rate-step" data-step="0.1" aria-label="Higher">${icon('plus')}</button>
         </div>
-        <label class="field-label" for="rateComments">What did you think?</label>
-        <textarea class="field" id="rateComments" rows="5" placeholder="Great food, a little pricey.&#10;Service was quick.&#10;One thought per line."></textarea>
-        <label class="field-label" for="rateOrder">Order this <span>(optional)</span></label>
-        <input class="field" id="rateOrder" placeholder="A dish worth getting" autocomplete="off">
-        <label class="switch-row"><span><b>Must-go</b><small>Highlights it no matter the score</small></span><input type="checkbox" id="rateMust" role="switch"><i></i></label>
-        <button class="btn btn-primary btn-block" id="rateSubmit">Submit</button>
-        <p class="try-foot">Copies your review so you can paste it in the Claude chat. The guide updates a few minutes after you send it.</p>
-      </div>`, { plain: true });
-    sheet.id = id || 'new';
+      </div>
+      <label class="field-label" for="rateComments">What did you think?</label>
+      <textarea class="field" id="rateComments" rows="5" placeholder="Great food, a little pricey.&#10;Service was quick.&#10;One thought per line.">${esc(comments)}</textarea>
+      <label class="field-label" for="rateOrder">Order this <span>(optional)</span></label>
+      <input class="field" id="rateOrder" placeholder="A dish worth getting" autocomplete="off" value="${esc(order)}">
+      <label class="switch-row"><span><b>Must-go</b><small>Highlights it no matter the score</small></span><input type="checkbox" id="rateMust" role="switch" ${must ? 'checked' : ''}><i></i></label>`;
+  }
+
+  function bindRateFields() {
     const range = $('#rateRange');
     const sync = () => {
       const r = Math.round(parseFloat(range.value) * 10) / 10;
@@ -1087,38 +1238,189 @@
     haptic(5);
   }
 
+  function readRateFields() {
+    return {
+      rating: Math.round(parseFloat($('#rateRange').value) * 10) / 10,
+      comments: $('#rateComments').value.split(/\n+/).map((c) => c.trim()).filter(Boolean),
+      order: $('#rateOrder').value.trim(),
+      mustGo: $('#rateMust').checked,
+    };
+  }
+
+  const sendFoot = (kind) => (ghToken()
+    ? `Sends straight to the guide. ${kind === 'research' ? 'Claude Sonnet looks it up' : 'Claude Haiku updates it'} in ${kind === 'research' ? 'about 5 minutes' : 'about 2 minutes'}.`
+    : 'Copies a message to paste in the Claude chat. <a href="#/connect" data-replace>Set up direct send</a> to skip that.');
+
+  // Rate a To Try spot, or update the rating of a spot already in the guide.
+  function openRate(id) {
+    const w = state.wishById.get(id);
+    const p = w ? null : state.byId.get(id);
+    const s = w || p;
+    if (!s) { closeSheet(); return; }
+    openSheet('rate', `
+      <div class="rate">
+        <div class="rate-head">${s.photos.length ? photo(s, 0, true) : mono(s)}<div><p class="eyebrow">${p ? 'Update our rating' : 'Rate it'}</p><h1 class="rate-title">${esc(s.name)}</h1></div></div>
+        ${rateFieldsHtml(p ? { rating: p.rating, comments: p.comments.join('\n'), order: p.mustTry.join(', '), must: p.verdict === 'Must-go' } : {})}
+        <button class="btn btn-primary btn-block" id="rateSubmit">${p ? 'Save' : 'Submit'}</button>
+        <p class="try-foot">${sendFoot('rate')}</p>
+      </div>`, { plain: true });
+    sheet.id = id;
+    bindRateFields();
+  }
+
   function submitRate() {
     const id = sheet.id;
-    const w = id !== 'new' ? state.wishById.get(id) : null;
-    const name = w ? w.name : ($('#rateName')?.value || '').trim();
-    const rating = Math.round(parseFloat($('#rateRange').value) * 10) / 10;
-    const comments = $('#rateComments').value.split(/\n+/).map((c) => c.trim()).filter(Boolean);
-    const order = $('#rateOrder').value.trim();
-    const mustGo = $('#rateMust').checked;
-    if (!name) { toast('Add the restaurant name', 'x'); $('#rateName')?.focus(); return; }
-    if (!comments.length) { toast('Add a comment or two', 'x'); $('#rateComments').focus(); return; }
+    const w = state.wishById.get(id);
+    const p = w ? null : state.byId.get(id);
+    const f = readRateFields();
+    if (!f.comments.length && !p) { toast('Add a comment or two', 'x'); $('#rateComments').focus(); return; }
+    sendRequest(w
+      ? { type: 'rate', id, name: w.name, ...f }
+      : { type: 'rerate', id, name: p.name, was: p.rating, ...f });
+  }
 
-    const text = [
-      `Add to the Grub Guide: ${name}`,
-      `Rating: ${rating.toFixed(1)}/10${mustGo ? ' (Must-go)' : ''}`,
-      ...(order ? [`Order this: ${order}`] : []),
-      ...comments.map((c) => `- ${c}`),
-      w ? `(It's on our To Try list as "${w.id}".)` : '(New place, not on our To Try list.)',
-    ].join('\n');
+  // Add a new place: save it for later (default) or rate it now.
+  function openNew(rateNow = false) {
+    openSheet('new', `
+      <div class="rate">
+        <p class="eyebrow">New place</p>
+        <h1 class="rate-title">Add a place</h1>
+        <input class="field" id="newName" placeholder="Restaurant name" autocomplete="off" autocapitalize="words" enterkeyhint="next">
+        <p class="new-hint" id="newHint" hidden></p>
+        <label class="field-label" for="newWhere">Where <span>(optional)</span></label>
+        <input class="field" id="newWhere" placeholder="Street, area or something nearby" autocomplete="off" enterkeyhint="next">
+        <div class="field-label">Type</div>
+        <div class="segmented seg-wide" id="newTier" role="tablist" aria-label="Type" style="--i:2">
+          <span class="segmented-thumb"></span>
+          <button role="tab" data-v="quick" aria-selected="false">Quick</button>
+          <button role="tab" data-v="sitdown" aria-selected="false">Sit-down</button>
+          <button role="tab" data-v="" aria-selected="true">Not sure</button>
+        </div>
+        <label class="switch-row new-switch"><span><b>Already been?</b><small>Rate it now instead of saving it for later</small></span><input type="checkbox" id="newRateNow" role="switch" ${rateNow ? 'checked' : ''}><i></i></label>
+        <div id="newRate" ${rateNow ? '' : 'hidden'}>${rateFieldsHtml()}</div>
+        <label class="field-label" for="newNote">Note for Claude <span>(optional)</span></label>
+        <textarea class="field" id="newNote" rows="2" placeholder="Which location, what they serve, who told us about it"></textarea>
+        <button class="btn btn-primary btn-block" id="newSubmit">${rateNow ? 'Add and rate' : 'Add to To Try'}</button>
+        <p class="try-foot">${sendFoot('research')}</p>
+      </div>`, { plain: true });
+    sheet.id = rateNow ? 'rate' : '';
+    sheet.newTier = '';
+    bindRateFields();
+    const toggle = $('#newRateNow');
+    toggle.addEventListener('change', () => {
+      haptic(8);
+      $('#newRate').hidden = !toggle.checked;
+      $('#newSubmit').textContent = toggle.checked ? 'Add and rate' : 'Add to To Try';
+    });
+    const name = $('#newName');
+    name.addEventListener('input', () => {
+      const hit = findByName(name.value);
+      const hint = $('#newHint');
+      hint.hidden = !hit;
+      if (hit) hint.innerHTML = hit.wish
+        ? `${esc(hit.name)} is already on To Try. <a href="#/rate/${esc(hit.id)}" data-replace>Rate it there</a>`
+        : `${esc(hit.name)} is already in the guide. <a href="#/p/${esc(hit.id)}" data-replace>Open it</a>`;
+    });
+    if (!rateNow) setTimeout(() => name.focus({ preventScroll: true }), 450);
+  }
 
+  const findByName = (n) => {
+    const k = normName(n);
+    if (k.length < 3) return null;
+    return state.wish.find((w) => normName(w.name) === k) || state.places.find((p) => normName(p.name) === k) || null;
+  };
+
+  function submitNew() {
+    const name = $('#newName').value.trim();
+    if (!name) { toast('Add the restaurant name', 'x'); $('#newName').focus(); return; }
+    const rateNow = $('#newRateNow').checked;
+    const hit = findByName(name);
+    if (hit && !hit.wish) { toast(`${hit.name} is already in the guide`, 'x'); return; }
+    if (hit && !rateNow) { toast(`${hit.name} is already on To Try`, 'x'); return; }
+    const base = { where: $('#newWhere').value.trim(), tier: sheet.newTier || '', note: $('#newNote').value.trim() };
+    if (!rateNow) { sendRequest({ type: 'add', name, ...base }); return; }
+    const f = readRateFields();
+    if (!f.comments.length) { toast('Add a comment or two', 'x'); $('#rateComments').focus(); return; }
+    sendRequest(hit ? { type: 'rate', id: hit.id, name: hit.name, ...f } : { type: 'ratenew', name, ...base, ...f });
+  }
+
+  /* ---------- Sending: GitHub when connected, otherwise copy for the chat ---------- */
+
+  function requestTitle(r) {
+    const score = r.rating != null ? ` (${r.rating.toFixed(1)}/10)` : '';
+    return { rate: `Rate ${r.name}${score}`, rerate: `Update ${r.name}${score}`, add: `To Try: ${r.name}`, ratenew: `New spot: ${r.name}${score}` }[r.type];
+  }
+
+  function chatMessage(r) {
+    const tiers = { quick: 'Quick', sitdown: 'Sit-down' };
+    const rating = r.rating != null ? [`Rating: ${r.rating.toFixed(1)}/10${r.mustGo ? ' (Must-go)' : ''}`, ...(r.order ? [`Order this: ${r.order}`] : []), ...r.comments.map((c) => `- ${c}`)] : [];
+    const place = [r.where && `Where: ${r.where}`, r.tier && `Type: ${tiers[r.tier]}`, r.note && `Note: ${r.note}`].filter(Boolean);
+    if (r.type === 'add') return [`Add to our To Try list: ${r.name}`, ...place].join('\n');
+    if (r.type === 'rerate') return [`Update our rating in the Grub Guide: ${r.name}`, ...rating, `(It's already in the guide as "${r.id}".)`].join('\n');
+    return [`Add to the Grub Guide: ${r.name}`, ...rating, ...place,
+      r.type === 'rate' ? `(It's on our To Try list as "${r.id}".)` : '(New place, not on our To Try list.)'].join('\n');
+  }
+
+  async function sendRequest(r) {
+    const key = `${r.type === 'add' ? 'add' : 'rate'}:${r.id || normName(r.name)}`;
+    const item = { key, type: r.type, id: r.id || '', name: r.name, rating: r.rating, was: r.was, ts: Date.now() };
+    const btn = $('#rateSubmit, #newSubmit');
+    let failed = false;
+    if (ghToken()) {
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        const payload = { type: r.type, id: r.id, name: r.name, rating: r.rating, mustGo: r.mustGo, order: r.order, comments: r.comments, tier: r.tier, where: r.where, note: r.note };
+        const issue = await ghApi(`/repos/${REPO}/issues`, {
+          method: 'POST',
+          body: {
+            title: requestTitle(r),
+            body: `<!-- grub-guide-request -->\nSent from the Grub Guide app. ${MODEL[r.type]} updates the guide and closes this issue.\n\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\`\n`,
+          },
+        });
+        addPending({ ...item, issue: issue.number, status: 'working' });
+        showSent(r);
+        return;
+      } catch (err) {
+        failed = true;
+        toast(err.status === 401 ? 'GitHub token expired' : 'Couldn’t send directly', 'x');
+      }
+    }
+    copyForChat(r, item, failed);
+  }
+
+  function showSent(r) {
+    haptic(14);
+    const text = {
+      rate: `${MODEL.rate} is moving ${r.name} over to the Guide. It shows up in about 2 minutes.`,
+      rerate: `${MODEL.rerate} is updating ${r.name}. It shows up in about 2 minutes.`,
+      add: `${MODEL.add} is looking up ${r.name}: photos, address, hours and the rest. It lands on the To Try list in about 5 minutes.`,
+      ratenew: `${MODEL.ratenew} is looking up ${r.name} and adding your rating. It shows up in the guide in about 5 minutes.`,
+    }[r.type];
+    sheet.scroll.innerHTML = `
+      <div class="rate rate-done">
+        <div class="compact-icon">${icon('check')}</div>
+        <h1 class="rate-title">Sent</h1>
+        <p class="rate-done-text">${esc(text)} You can close the app.</p>
+        <button class="btn btn-primary btn-block" id="rateDone">Done</button>
+      </div>`;
+    renderTry();
+  }
+
+  function copyForChat(r, item, failed) {
+    const text = chatMessage(r);
     let copied = false;
     try {
-      navigator.clipboard.writeText(text).then(() => { copied = true; }, () => {});
+      navigator.clipboard.writeText(text).then(() => {}, () => {});
       copied = true;
     } catch (_) { /* clipboard unavailable */ }
-
-    writePending([...readPending().filter((x) => x.id !== (w ? w.id : name)), { id: w ? w.id : name, name, rating, ts: Date.now() }]);
+    addPending({ ...item, status: 'copied' });
     haptic(14);
     sheet.scroll.innerHTML = `
       <div class="rate rate-done">
         <div class="compact-icon">${icon(copied ? 'check' : 'copy')}</div>
         <h1 class="rate-title">${copied ? 'Copied' : 'Copy this'}</h1>
-        <p class="rate-done-text">Open the Claude chat, paste, and send. ${esc(name)} shows up here a few minutes later.</p>
+        <p class="rate-done-text">${failed ? 'GitHub didn’t take it, so here’s the message instead. ' : ''}Open the Claude chat, paste, and send. ${esc(r.name)} shows up here a few minutes later.</p>
         <pre class="rate-preview" id="ratePreview">${esc(text)}</pre>
         <a class="btn btn-primary btn-block" href="${CLAUDE_URL}" target="_blank" rel="noopener">${icon('bubble')}Open Claude chat</a>
         <button class="btn btn-tinted btn-block" id="rateCopy">${icon('copy')}Copy again</button>
@@ -1300,7 +1602,10 @@
     const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     if (h.startsWith('p/')) return { kind: 'place', id: h.slice(2) };
     if (h.startsWith('w/')) return { kind: 'wish', id: h.slice(2) };
+    if (h === 'rate/new' || h === 'new/rate') return { kind: 'new', id: 'rate' };
     if (h.startsWith('rate/')) return { kind: 'rate', id: h.slice(5) };
+    if (h === 'new') return { kind: 'new', id: '' };
+    if (h === 'connect') return { kind: 'connect' };
     if (h === 'add') return { kind: 'add' };
     if (h === 'pick') return { kind: 'pick' };
     if (h === 'ranks') return { kind: 'ranks' };
@@ -1311,9 +1616,9 @@
     const r = parseRoute();
     if (!r.kind) { hideSheet(); return; }
     if (!state.loaded) return;
-    const same = sheet.kind === r.kind && (!['place', 'wish', 'rate'].includes(r.kind) || sheet.id === r.id);
+    const same = sheet.kind === r.kind && (!['place', 'wish', 'rate', 'new'].includes(r.kind) || sheet.id === r.id);
     if (same) return;
-    const open = () => ({ place: () => openPlace(r.id), wish: () => openWish(r.id), rate: () => openRate(r.id), add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
+    const open = () => ({ place: () => openPlace(r.id), wish: () => openWish(r.id), rate: () => openRate(r.id), new: () => openNew(r.id === 'rate'), connect: openConnect, add: openAdd, pick: openPick, ranks: openRanks })[r.kind]();
     if (sheet.kind) {
       hideSheet();
       sheet.closeTimer && clearTimeout(sheet.closeTimer);
@@ -1366,7 +1671,7 @@
         go(`#/${open.dataset.open}`);
         return;
       }
-      const segBtn = e.target.closest('#tryFilter button, #spinTier button, #spinPool button');
+      const segBtn = e.target.closest('#tryFilter button, #spinTier button, #spinPool button, #newTier button');
       if (segBtn) {
         const seg = segBtn.parentElement;
         const btns = $$('button', seg);
@@ -1377,6 +1682,7 @@
         btns.forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
         const v = segBtn.dataset.v;
         if (seg.id === 'tryFilter') { state.tryFilter = v; setTimeout(renderTry, 160); }
+        else if (seg.id === 'newTier') { sheet.newTier = v; }
         else {
           if (seg.id === 'spinTier') state.spinTier = v; else state.spinPool = v;
           $('#pickResult').innerHTML = '';
@@ -1392,6 +1698,11 @@
       const step = e.target.closest('.rate-step');
       if (step) { stepRate(parseFloat(step.dataset.step)); return; }
       if (e.target.closest('#rateSubmit')) { submitRate(); return; }
+      if (e.target.closest('#newSubmit')) { submitNew(); return; }
+      if (e.target.closest('#ghConnect')) { connectGitHub(); return; }
+      if (e.target.closest('#ghDisconnect')) { setGhToken(''); haptic(8); toast('Disconnected'); openConnect(); return; }
+      const dismiss = e.target.closest('[data-dismiss]');
+      if (dismiss) { haptic(6); writePending(readPending().filter((x) => x.key !== dismiss.dataset.dismiss)); renderActivity(); renderTry(); return; }
       if (e.target.closest('#rateDone')) { closeSheet(); return; }
       if (e.target.closest('#rateCopy')) { copyReview(); return; }
       if (e.target.closest('#spinAgain')) { $('#spinBtn').hidden = false; $('#spinBtn').disabled = false; doSpin(); return; }
@@ -1414,7 +1725,10 @@
     $('#mapFit').addEventListener('click', () => { haptic(); selectPin(null); fitMap(); });
     $('#sheetClose').addEventListener('click', closeSheet);
     $('#scrim').addEventListener('click', closeSheet);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheet.kind) closeSheet(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sheet.kind) closeSheet();
+      if (e.key === 'Enter' && e.target.id === 'ghToken') connectGitHub();
+    });
 
     const search = $('#search');
     const label = $('.search');
@@ -1454,14 +1768,16 @@
       get(WISH_URL).catch((err) => { console.error('Could not load wishlist', err); return null; }),
     ]);
     if (quiet && !places) return;
-    const before = state.places.length;
+    const sig = JSON.stringify([places, wish]);
+    const same = sig === state.sig;
+    state.sig = sig;
     state.places = normalize(places);
     state.wish = normalizeWish(wish);
     state.byId = new Map(state.places.map((p) => [p.id, p]));
     state.wishById = new Map(state.wish.map((w) => [w.id, w]));
     state.loaded = true;
     settlePending();
-    if (quiet && state.places.length === before) { renderTry(); return; }
+    if (quiet && same) { renderTry(); return; }
     renderGuide(!quiet);
     renderTry();
     renderStats();
@@ -1469,10 +1785,21 @@
     if (!quiet) applyRoute();
   }
 
-  // While a rating is on its way, check for the update so it appears on its own.
+  // While a request is on its way, watch its GitHub issue and the data so the
+  // update appears on its own.
   function watchPending() {
-    const check = () => { if (!document.hidden && readPending().length) load({ quiet: true }); };
-    setInterval(check, 45000);
+    let busy = false;
+    const check = async () => {
+      const list = readPending().filter((x) => x.status !== 'failed');
+      if (document.hidden || busy || !list.length) return;
+      busy = true;
+      try {
+        await pollIssues();
+        await load({ quiet: true });
+      } finally { busy = false; }
+    };
+    setInterval(check, 20000);
+    setInterval(renderActivity, 30000);
     document.addEventListener('visibilitychange', check);
   }
 
