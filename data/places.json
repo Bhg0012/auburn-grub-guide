@@ -867,6 +867,42 @@
         "images/places/culvers/5.jpg"
       ],
       "photoCredit": "Yelp reviewers"
+    },
+    {
+      "id": "mcalisters",
+      "name": "McAlister's Deli",
+      "category": "Deli",
+      "price": "$$",
+      "tier": "quick",
+      "rating": 7.8,
+      "comments": [
+        "Clean environment.",
+        "Fresh and light, not too heavy.",
+        "Decent prices."
+      ],
+      "mustTry": [
+        "Savannah chopped salad"
+      ],
+      "tags": [
+        "Sandwiches",
+        "Salads",
+        "Sweet tea"
+      ],
+      "added": "2026-11-01T12:00:00",
+      "blurb": "Counter-service deli chain known for sandwiches, spuds, salads and sweet tea. Half entree and side meals are a budget-friendly option.",
+      "address": "1651 E University Dr, Auburn, AL 36830",
+      "area": "E University Dr",
+      "lat": 32.6112,
+      "lng": -85.4484,
+      "phone": "(334) 502-0101",
+      "website": "https://locations.mcalistersdeli.com/al/auburn/1651-east-university-drive",
+      "hours": "Daily 10am-10pm",
+      "photos": [
+        "images/places/mcalisters/1.jpg",
+        "images/places/mcalisters/2.jpg",
+        "images/places/mcalisters/3.jpg"
+      ],
+      "photoCredit": "McAlister's Deli"
     }
   ]
 }
