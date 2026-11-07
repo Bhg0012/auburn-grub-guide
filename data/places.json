@@ -6,7 +6,7 @@
       "category": "Breakfast",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 8.0,
+      "rating": 8.4,
       "comments": [
         "Unique breakfast options you don't always see.",
         "They serve breakfast until 2pm, which is good. Most other places stop serving by then."
@@ -41,7 +41,7 @@
       "category": "Sushi",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 8.4,
+      "rating": 8.8,
       "verdict": "Must-go",
       "comments": [
         "All you can eat sushi, and it's fresh.",
@@ -77,7 +77,7 @@
       "category": "Chicken",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.1,
+      "rating": 7.5,
       "comments": [
         "Not bad, and it's open late downtown.",
         "Pretty salty. Good, but expensive.",
@@ -116,7 +116,7 @@
       "category": "Mac & Cheese",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.6,
+      "rating": 8.0,
       "comments": [
         "Open late downtown.",
         "On the more expensive side, but unique.",
@@ -151,7 +151,7 @@
       "category": "Chicken",
       "price": "$",
       "tier": "quick",
-      "rating": 7.0,
+      "rating": 7.4,
       "comments": [
         "Ole reliable.",
         "They don't do anything that great or that bad.",
@@ -185,7 +185,7 @@
       "category": "Mexican",
       "price": "$",
       "tier": "quick",
-      "rating": 7.3,
+      "rating": 7.7,
       "comments": [
         "Like most Chipotles, so you know what you're getting for the most part.",
         "Really convenient location.",
@@ -220,7 +220,7 @@
       "category": "Subs",
       "price": "$",
       "tier": "quick",
-      "rating": 7.4,
+      "rating": 7.8,
       "comments": [
         "A little out of the way, but good if you're near the highway.",
         "Good service.",
@@ -255,7 +255,7 @@
       "category": "Sushi",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.1,
+      "rating": 7.5,
       "comments": [
         "Pretty solid quality.",
         "Very fast service. Sometimes it's ready in 1-2 minutes.",
@@ -287,7 +287,7 @@
       "category": "Chicken",
       "price": "$",
       "tier": "quick",
-      "rating": 8.1,
+      "rating": 8.5,
       "comments": [
         "So many locations.",
         "Always amazing service.",
@@ -322,7 +322,7 @@
       "category": "Dining Hall",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.4,
+      "rating": 7.8,
       "comments": [
         "Amazing breakfast.",
         "All you can eat, with lots and lots of choices.",
@@ -355,7 +355,7 @@
       "category": "Dining Hall",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.4,
+      "rating": 7.8,
       "comments": [
         "Nicer workers than The Edge.",
         "Fewer choices than The Edge, but higher quality food."
@@ -383,7 +383,7 @@
       "category": "Bagels",
       "price": "$$",
       "tier": "quick",
-      "rating": 6.9,
+      "rating": 7.3,
       "comments": [
         "On the expensive side for what you get.",
         "Good quality, and unique."
@@ -415,7 +415,7 @@
       "category": "Mexican",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 7.5,
+      "rating": 7.9,
       "comments": [
         "Cool drinks.",
         "A little pricier.",
@@ -452,7 +452,7 @@
       "category": "Mexican",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 7.9,
+      "rating": 8.3,
       "comments": [
         "Smaller place, usually pretty busy.",
         "Great food at normal prices.",
@@ -489,7 +489,7 @@
       "category": "Mexican",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 8.1,
+      "rating": 8.5,
       "comments": [
         "Can get really busy.",
         "Great food, a little pricier.",
@@ -527,7 +527,7 @@
       "category": "Mexican",
       "price": "$$",
       "tier": "sitdown",
-      "rating": 7.5,
+      "rating": 7.9,
       "comments": [
         "Normal Mexican food, nothing too special.",
         "Decent service.",
@@ -561,7 +561,7 @@
       "category": "Chicken Salad",
       "price": "$$",
       "tier": "quick",
-      "rating": 6.7,
+      "rating": 7.1,
       "comments": [
         "Good food.",
         "High calories.",
@@ -598,7 +598,7 @@
       "category": "Burgers",
       "price": "$",
       "tier": "quick",
-      "rating": 7.4,
+      "rating": 7.8,
       "comments": [
         "Solid quality.",
         "Lots of options.",
@@ -636,7 +636,7 @@
       "category": "Food Hall",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.3,
+      "rating": 7.7,
       "comments": [
         "Cool options.",
         "Good location.",
@@ -676,7 +676,7 @@
       "category": "Deli",
       "price": "$$",
       "tier": "quick",
-      "rating": 6.9,
+      "rating": 7.3,
       "comments": [
         "Auburn staple, famous.",
         "Decent quality.",
@@ -714,7 +714,7 @@
       "category": "Chinese",
       "price": "$",
       "tier": "quick",
-      "rating": 7.7,
+      "rating": 8.1,
       "comments": [
         "Very quick service.",
         "The online menu doesn't match the physical inventory sometimes.",
@@ -756,7 +756,7 @@
       "category": "Breakfast",
       "price": "$",
       "tier": "quick",
-      "rating": 7.3,
+      "rating": 7.7,
       "comments": [
         "Price is average.",
         "Decent quality.",
@@ -795,7 +795,7 @@
       "category": "Seafood",
       "price": "$",
       "tier": "quick",
-      "rating": 6.6,
+      "rating": 7.0,
       "comments": [
         "Cool atmosphere, feels comfy and homey.",
         "Quick service.",
@@ -832,7 +832,7 @@
       "category": "Burgers",
       "price": "$$",
       "tier": "quick",
-      "rating": 8.0,
+      "rating": 8.4,
       "verdict": "Must-go",
       "comments": [
         "Amazing quality.",
@@ -874,7 +874,7 @@
       "category": "Deli",
       "price": "$$",
       "tier": "quick",
-      "rating": 7.8,
+      "rating": 8.2,
       "comments": [
         "Clean environment.",
         "Fresh and light, not too heavy.",
