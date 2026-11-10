@@ -212,6 +212,7 @@ html.sheet-full #app {
   display: flex;
   gap: 10px;
 }
+.nav-actions--left { right: auto; left: 14px; }
 
 .glass, .glass-btn {
   background: var(--glass-bg);
@@ -658,6 +659,36 @@ html.sheet-full #app {
 }
 .card-quote::before { content: "\201C"; color: var(--accent); font-weight: 700; margin-right: 1px; }
 .card-quote::after { content: "\201D"; color: var(--accent); font-weight: 700; margin-left: 1px; }
+
+/* Compact view: one short row per spot so more fit on screen. */
+.cards.is-compact { gap: 8px; }
+.card--row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 16px;
+}
+.card--row .row-ph { position: relative; flex: none; }
+.card--row .ph { width: 60px; height: 60px; aspect-ratio: auto; border-radius: 11px; }
+.card--row .ph .ph-glyph .ic { width: 24px; height: 24px; }
+.card--row .rank {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 12px;
+  background: rgba(30, 30, 30, 0.6);
+}
+.card--row .rank.r1 { background: linear-gradient(160deg, #FFD54A, #E89B00); }
+.card--row .rank.r2 { background: linear-gradient(160deg, #E4E9EE, #9AA5B1); }
+.card--row .rank.r3 { background: linear-gradient(160deg, #F0B07A, #B76A32); }
+.row-text { flex: 1; min-width: 0; }
+.card--row .card-title { font-size: 17px; letter-spacing: -0.02em; }
+.card--row .card-meta { margin-top: 1px; font-size: 14px; }
 
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px) scale(0.985); }
