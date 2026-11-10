@@ -1914,6 +1914,34 @@ textarea.field { min-height: 120px; }
 }
 #rateRange::-moz-range-thumb { width: 30px; height: 30px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
 
+/* Where it lands: the rated spots just above and below the score on the slider. */
+.rate-ladder { margin-top: 14px; text-align: left; }
+.rate-ladder:empty { display: none; }
+.ladder-head { display: flex; justify-content: space-between; padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--label-2); }
+.ladder-head span + span { letter-spacing: 0; text-transform: none; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ladder-row {
+  display: grid;
+  grid-template-columns: 34px 26px 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font: inherit;
+  color: var(--label);
+  text-align: left;
+}
+button.ladder-row:active { background: var(--fill); }
+.ladder-row b { font-family: var(--font-round); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--label-2); }
+.ladder-row .ph, .ladder-row i { width: 26px; height: 26px; border-radius: 7px; }
+.ladder-row .ph-glyph .ic { stroke-width: 2; }
+.ladder-row span { font-size: 15px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ladder-row.is-self { background: var(--accent-soft); }
+.ladder-row.is-self b, .ladder-row.is-self span { color: var(--accent); font-weight: 700; }
+.ladder-row.is-self i { border: 2px dashed var(--accent); opacity: 0.55; }
+.ladder-foot { margin-top: 6px; font-size: 12px; text-align: center; color: var(--label-3); }
+
 .switch-row {
   display: flex;
   align-items: center;

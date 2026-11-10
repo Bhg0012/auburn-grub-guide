@@ -76,7 +76,7 @@ Editing or removing a spot works the same way: change `data/places.json` (and ph
 
 ## Sending from the app
 
-The + sheet has **Add a place** (name, optional where/type/note, and an "Already been?" switch that is off by default, so it saves to To Try; switched on it shows the rating form) and **Rate a place we tried**. Every To Try spot has **Rate it**, and every rated spot has **Update our rating** (prefilled form).
+The + sheet has **Add a place** (name, optional where/type/note, and an "Already been?" switch that is off by default, so it saves to To Try; switched on it shows the rating form) and **Rate a place we tried**. Every To Try spot has **Rate it**, and every rated spot has **Update our rating** (prefilled form). Under the rating slider, "Where it lands" (`ladderHtml()` in `app.js`) shows the rank (#n of N) and the two rated spots just above and below the current score, updating live; tapping one sets the slider to its score.
 
 **Direct send (when the phone is connected):** the app stores a fine-grained GitHub token (Issues read/write, this repo only) in localStorage (`#/connect`) and opens an issue whose body has `<!-- grub-guide-request -->` and a JSON block `{type, id, name, rating, mustGo, order, comments, tier, where, note}`. `.github/workflows/app-requests.yml` runs `scripts/agent/run.mjs` on issues the repo owner opens. It handles every open request oldest first:
 - `rate` (To Try spot) and `rerate` (rated spot): done in code, plus one **Claude Haiku** (`claude-haiku-5-5`) call to tidy comments and pick tags/price. Under a cent.

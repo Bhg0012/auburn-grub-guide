@@ -1360,6 +1360,7 @@
           <input type="range" id="rateRange" min="0" max="10" step="0.1" value="${rating}" aria-label="Rating out of 10">
           <button type="button" class="rate-step" data-step="0.1" aria-label="Higher">${icon('plus')}</button>
         </div>
+        <div class="rate-ladder" id="rateLadder" aria-live="polite"></div>
       </div>
       <label class="field-label" for="rateComments">What did you think?</label>
       <textarea class="field" id="rateComments" rows="5" placeholder="Great food, a little pricey.&#10;Service was quick.&#10;One thought per line.">${esc(comments)}</textarea>
@@ -1368,14 +1369,41 @@
       <label class="switch-row"><span><b>Must-go</b><small>Highlights it no matter the score</small></span><input type="checkbox" id="rateMust" role="switch" ${must ? 'checked' : ''}><i></i></label>`;
   }
 
-  function bindRateFields() {
+  // Where a score would land among the spots we've rated: the two just above, this one, the two just below.
+  function ladderHtml(r, selfId) {
+    const self = state.byId.get(selfId) || state.wishById.get(selfId);
+    const others = state.places.filter((p) => p.id !== selfId).sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
+    if (!others.length) return '';
+    const at = others.filter((p) => p.rating > r).length;
+    const rows = [...others.slice(0, at), null, ...others.slice(at)];
+    const start = clamp(at - 2, 0, Math.max(0, rows.length - 5));
+    const row = (p) => (p
+      ? `<button type="button" class="ladder-row" data-match="${p.rating}" aria-label="Match ${esc(p.name)}, ${fmtRating(p.rating)}"><b>${fmtRating(p.rating)}</b>${photo(p)}<span>${esc(p.name)}</span></button>`
+      : `<div class="ladder-row is-self"><b>${r.toFixed(1)}</b>${self ? photo(self) : '<i></i>'}<span>${self ? esc(self.name) : 'This one'}</span></div>`);
+    return `
+      <div class="ladder-head"><span>Where it lands</span><span>#${at + 1} of ${rows.length}</span></div>
+      ${rows.slice(start, start + 5).map(row).join('')}
+      <p class="ladder-foot">Tap a spot to match its score</p>`;
+  }
+
+  function setRate(v) {
     const range = $('#rateRange');
+    if (!range) return;
+    range.value = clamp(Math.round(v * 10) / 10, 0, 10);
+    range.dispatchEvent(new Event('input'));
+  }
+
+  function bindRateFields(selfId = '') {
+    const range = $('#rateRange');
+    const ladder = $('#rateLadder');
     const sync = () => {
       const r = Math.round(parseFloat(range.value) * 10) / 10;
       $('#rateNum').textContent = r.toFixed(1);
       $('#rateStars').innerHTML = stars(r);
       $('#rateVerdict').textContent = $('#rateMust').checked ? 'Must-go' : verdict(r);
       range.style.setProperty('--p', `${r * 10}%`);
+      const html = ladderHtml(r, selfId);
+      if (ladder.dataset.html !== html) { ladder.innerHTML = html; ladder.dataset.html = html; }
     };
     range.addEventListener('input', () => { sync(); if (Math.round(range.value * 10) % 5 === 0) haptic(3); });
     $('#rateMust').addEventListener('change', () => { haptic(8); sync(); });
@@ -1385,8 +1413,7 @@
   function stepRate(delta) {
     const range = $('#rateRange');
     if (!range) return;
-    range.value = clamp(Math.round((parseFloat(range.value) + delta) * 10) / 10, 0, 10);
-    range.dispatchEvent(new Event('input'));
+    setRate(parseFloat(range.value) + delta);
     haptic(5);
   }
 
@@ -1417,7 +1444,7 @@
         <p class="try-foot">${sendFoot('rate')}</p>
       </div>`, { plain: true });
     sheet.id = id;
-    bindRateFields();
+    bindRateFields(id);
   }
 
   function submitRate() {
@@ -1857,6 +1884,8 @@
       if (e.target.closest('#spinBtn')) { doSpin(); return; }
       const step = e.target.closest('.rate-step');
       if (step) { stepRate(parseFloat(step.dataset.step)); return; }
+      const match = e.target.closest('[data-match]');
+      if (match) { setRate(parseFloat(match.dataset.match)); haptic(8); return; }
       if (e.target.closest('#rateSubmit')) { submitRate(); return; }
       if (e.target.closest('#newSubmit')) { submitNew(); return; }
       if (e.target.closest('#ghConnect')) { connectGitHub(); return; }
