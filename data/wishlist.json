@@ -778,28 +778,6 @@
         "images/places/the-depot/5.jpg"
       ],
       "photoCredit": "The Depot"
-    },
-    {
-      "id": "hectors-cantina",
-      "name": "Hector's Cantina & Grill",
-      "category": "Mexican",
-      "tier": "sitdown",
-      "area": "Auburn",
-      "added": "2026-11-07T12:00:00",
-      "blurb": "Sit-down Mexican restaurant on South College Street in Auburn, known for fajitas, shrimp dishes, chimichangas and margaritas. Dine-in, takeout and delivery.",
-      "address": "1936 S College St, Auburn, AL 36832",
-      "lat": 32.569229,
-      "lng": -85.501259,
-      "phone": "(334) 209-1642",
-      "hours": "Mon-Wed 11am-10pm, Thu-Sat 11am-10:30pm, Sun 11am-9pm",
-      "photos": [
-        "images/places/hectors-cantina/1.jpg",
-        "images/places/hectors-cantina/2.jpg",
-        "images/places/hectors-cantina/3.jpg",
-        "images/places/hectors-cantina/4.jpg",
-        "images/places/hectors-cantina/5.jpg"
-      ],
-      "photoCredit": "Yelp reviewers"
     }
   ]
 }

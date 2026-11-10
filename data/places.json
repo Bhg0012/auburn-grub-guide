@@ -903,6 +903,44 @@
         "images/places/mcalisters/3.jpg"
       ],
       "photoCredit": "McAlister's Deli"
+    },
+    {
+      "id": "hectors-cantina",
+      "name": "Hector's Cantina & Grill",
+      "category": "Mexican",
+      "price": "$$",
+      "tier": "sitdown",
+      "rating": 8.6,
+      "verdict": "Must-go",
+      "comments": [
+        "Great price.",
+        "Really unique, cool atmosphere.",
+        "Delicious food."
+      ],
+      "mustTry": [
+        "Green Spaghetti"
+      ],
+      "tags": [
+        "Sit-Down",
+        "Mexican",
+        "Dine-In"
+      ],
+      "added": "2026-11-09T22:55:47",
+      "blurb": "Sit-down Mexican restaurant on South College Street in Auburn, known for fajitas, shrimp dishes, chimichangas and margaritas. Dine-in, takeout and delivery.",
+      "address": "1936 S College St, Auburn, AL 36832",
+      "area": "Auburn",
+      "lat": 32.569229,
+      "lng": -85.501259,
+      "phone": "(334) 209-1642",
+      "hours": "Mon-Wed 11am-10pm, Thu-Sat 11am-10:30pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/hectors-cantina/1.jpg",
+        "images/places/hectors-cantina/2.jpg",
+        "images/places/hectors-cantina/3.jpg",
+        "images/places/hectors-cantina/4.jpg",
+        "images/places/hectors-cantina/5.jpg"
+      ],
+      "photoCredit": "Yelp reviewers"
     }
   ]
 }
