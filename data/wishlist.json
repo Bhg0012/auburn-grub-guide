@@ -778,6 +778,27 @@
         "images/places/the-depot/5.jpg"
       ],
       "photoCredit": "The Depot"
+    },
+    {
+      "id": "el-ranchero",
+      "name": "El Ranchero",
+      "category": "Mexican",
+      "tier": "sitdown",
+      "area": "Auburn",
+      "added": "2026-11-13T12:00:00",
+      "blurb": "Family-run Mexican restaurant on Spirit Drive off S College St in Auburn. Known for sizzling fajita platters, grilled meats and seafood plates, with online ordering available.",
+      "address": "114 Spirit Dr, Auburn, AL 36830",
+      "lat": 32.5607165,
+      "lng": -85.5034283,
+      "phone": "(334) 246-3501",
+      "website": "https://www.elrancheroauburn.com/",
+      "hours": "Mon-Thu 11am-9pm, Fri-Sat 11am-10pm, Sun 11am-9pm",
+      "photos": [
+        "images/places/el-ranchero/1.jpg",
+        "images/places/el-ranchero/2.jpg",
+        "images/places/el-ranchero/3.jpg"
+      ],
+      "photoCredit": "El Ranchero"
     }
   ]
 }
